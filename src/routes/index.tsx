@@ -3,11 +3,13 @@ import { Search, ShoppingBag, Menu, X, ArrowRight } from 'lucide-react'
 import { useState, useEffect, useRef } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { useCart } from '@/hooks/use-cart'
 
 export const Route = createFileRoute('/')({ component: HomePage })
 
 function HomePage() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
+	const { itemCount } = useCart()
+	const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [scrollY, setScrollY] = useState(0)
   const [isHeroVisible, setIsHeroVisible] = useState(false)
   const [isCollectionsVisible, setIsCollectionsVisible] = useState(false)
@@ -128,9 +130,14 @@ function HomePage() {
               <button className="p-2 hover:bg-white/10 rounded-full transition-colors">
                 <Search className="w-5 h-5" />
               </button>
-              <button className="p-2 hover:bg-white/10 rounded-full transition-colors">
+              <Link to="/cart" className="relative p-2 hover:bg-white/10 rounded-full transition-colors">
                 <ShoppingBag className="w-5 h-5" />
-              </button>
+                {itemCount > 0 && (
+                  <span className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 bg-white text-black text-xs font-black rounded-sm">
+                    {itemCount}
+                  </span>
+                )}
+              </Link>
               <button
                 className="md:hidden p-2 hover:bg-white/10 rounded-full transition-colors"
                 onClick={() => setIsMenuOpen(!isMenuOpen)}

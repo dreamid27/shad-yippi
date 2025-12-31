@@ -2,104 +2,94 @@ import { createFileRoute, Link } from '@tanstack/react-router'
 import { Search, ShoppingBag, ArrowLeft, Plus, Minus, Truck, Shield, RefreshCw, Star } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
+import { useCart, type Product } from '@/hooks/use-cart'
 
 export const Route = createFileRoute('/product/$id')({ component: ProductDetailPage })
 
 function ProductDetailPage() {
-  const { id } = Route.useParams()
-  const [selectedImage, setSelectedImage] = useState(0)
-  const [selectedSize, setSelectedSize] = useState('')
-  const [quantity, setQuantity] = useState(1)
-  const [isZoomed, setIsZoomed] = useState(false)
-  const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 })
+	const { addItem, itemCount } = useCart()
+	const { id } = Route.useParams()
+	const [selectedImage, setSelectedImage] = useState(0)
+	const [selectedSize, setSelectedSize] = useState('')
+	const [quantity, setQuantity] = useState(1)
+	const [isZoomed, setIsZoomed] = useState(false)
+	const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 })
+	const [addedToCart, setAddedToCart] = useState(false)
 
-  // Mock product data - in a real app, this would come from an API
-  const product = {
-    id: id,
-    name: 'ARCHITECTURAL COAT',
-    designer: 'ÆTHER',
-    price: 890,
-    originalPrice: 1200,
-    description: 'A statement piece that embodies brutalist architecture in garment form. This structured coat features exaggerated proportions, clean lines, and precision tailoring that creates a powerful silhouette.',
-    details: [
-      '100% Italian wool blend',
-      'Oversized structured silhouette',
-      'Notched lapels with geometric cut',
-      'Kissed closure with hidden buttons',
-      'Interior silk lining with monogram',
-      'Dry clean only',
-      'Made in Italy'
-    ],
-    sizes: ['XS', 'S', 'M', 'L', 'XL'],
-    availableSizes: ['S', 'M', 'L'],
-    images: [
-      'https://images.unsplash.com/photo-1544966503-7e3c4c371b9c?w=1200&h=1800&fit=crop',
-      'https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?w=1200&h=1800&fit=crop',
-      'https://images.unsplash.com/photo-1571115764595-644a1f56a55c?w=1200&h=1800&fit=crop',
-      'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=1200&h=1800&fit=crop'
-    ],
-    category: 'Outerwear',
-    badge: 'NEW',
-    rating: 4.8,
-    reviews: 124
-  }
+	// Mock product data - in a real app, this would come from an API
+	const product: Product = {
+		id: id,
+		name: 'ARCHITECTURAL COAT',
+		price: 890,
+		image: 'https://images.unsplash.com/photo-1544966503-7e3c4c371b9c?w=1200&h=1800&fit=crop',
+		description: 'A statement piece that embodies brutalist architecture in garment form. This structured coat features exaggerated proportions, clean lines, and precision tailoring that creates a powerful silhouette.',
+		brand: 'ÆTHER',
+		sizes: ['XS', 'S', 'M', 'L', 'XL'],
+		category: 'Outerwear',
+		originalPrice: 1200,
+		badge: 'NEW',
+	}
 
-  const relatedProducts = [
-    {
-      id: 2,
-      name: 'SCULPTURAL KNIT',
-      price: 420,
-      image: 'https://images.unsplash.com/photo-1434389677669-e08b4cac3106?w=600&h=900&fit=crop',
-      category: 'Knitwear'
-    },
-    {
-      id: 3,
-      name: 'GEOMETRIC TROUSER',
-      price: 520,
-      image: 'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=600&h=900&fit=crop',
-      category: 'Bottoms'
-    },
-    {
-      id: 5,
-      name: 'STRUCTURAL BOOT',
-      price: 650,
-      originalPrice: 850,
-      image: 'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=600&h=900&fit=crop',
-      category: 'Footwear',
-      badge: 'SALE'
-    },
-    {
-      id: 6,
-      name: 'GEOMETRIC BAG',
-      price: 320,
-      image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=600&h=900&fit=crop',
-      category: 'Accessories'
-    }
-  ]
+	const relatedProducts: Product[] = [
+		{
+			id: 2,
+			name: 'SCULPTURAL KNIT',
+			price: 420,
+			image: 'https://images.unsplash.com/photo-1434389677669-e08b4cac3106?w=600&h=900&fit=crop',
+			category: 'Knitwear'
+		},
+		{
+			id: 3,
+			name: 'GEOMETRIC TROUSER',
+			price: 520,
+			image: 'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=600&h=900&fit=crop',
+			category: 'Bottoms'
+		},
+		{
+			id: 5,
+			name: 'STRUCTURAL BOOT',
+			price: 650,
+			originalPrice: 850,
+			image: 'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=600&h=900&fit=crop',
+			category: 'Footwear',
+			badge: 'SALE'
+		},
+		{
+			id: 6,
+			name: 'GEOMETRIC BAG',
+			price: 320,
+			image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=600&h=900&fit=crop',
+			category: 'Accessories'
+		}
+	]
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect()
-    const x = ((e.clientX - rect.left) / rect.width) * 100
-    const y = ((e.clientY - rect.top) / rect.height) * 100
-    setZoomPosition({ x, y })
-  }
+	const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+		const rect = e.currentTarget.getBoundingClientRect()
+		const x = ((e.clientX - rect.left) / rect.width) * 100
+		const y = ((e.clientY - rect.top) / rect.height) * 100
+		setZoomPosition({ x, y })
+	}
 
-  const addToCart = () => {
-    if (!selectedSize) {
-      alert('Please select a size')
-      return
-    }
-    // Handle add to cart logic
-    console.log('Added to cart:', { product, size: selectedSize, quantity })
-  }
+	const handleAddToCart = () => {
+		if (!selectedSize) {
+			alert('Please select a size')
+			return
+		}
+		// Add to cart with quantity
+		for (let i = 0; i < quantity; i++) {
+			addItem(product)
+		}
+		setAddedToCart(true)
+		setTimeout(() => setAddedToCart(false), 2000)
+	}
 
-  if (!product) {
-    return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
-        <p>Product not found</p>
-      </div>
-    )
-  }
+	if (!product) {
+		return (
+			<div className="min-h-screen bg-black text-white flex items-center justify-center">
+				<p>Product not found</p>
+			</div>
+		)
+	}
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -120,9 +110,17 @@ function ProductDetailPage() {
               <button className="p-2 hover:bg-white/10 rounded-full transition-colors">
                 <Search className="w-5 h-5" />
               </button>
-              <button className="p-2 hover:bg-white/10 rounded-full transition-colors">
+              <Link
+                to="/cart"
+                className="relative p-2 hover:bg-white/10 rounded-full transition-colors"
+              >
                 <ShoppingBag className="w-5 h-5" />
-              </button>
+                {itemCount > 0 && (
+                  <span className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 bg-white text-black text-xs font-black rounded-sm">
+                    {itemCount}
+                  </span>
+                )}
+              </Link>
             </div>
           </div>
         </div>
@@ -147,29 +145,11 @@ function ProductDetailPage() {
               <div
                 className="absolute inset-0 bg-cover bg-center transition-transform duration-300"
                 style={{
-                  backgroundImage: `url(${product.images[selectedImage]})`,
+                  backgroundImage: `url(${product.image})`,
                   transform: isZoomed ? 'scale(2)' : 'scale(1)',
                   transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%`
                 }}
               />
-            </div>
-
-            {/* Thumbnail Gallery */}
-            <div className="grid grid-cols-4 gap-4">
-              {product.images.map((image, index) => (
-                <button
-                  key={index}
-                  onClick={() => setSelectedImage(index)}
-                  className={`h-24 bg-gray-900 overflow-hidden border-2 transition-colors ${
-                    selectedImage === index ? 'border-white' : 'border-transparent hover:border-white/50'
-                  }`}
-                >
-                  <div
-                    className="w-full h-full bg-cover bg-center"
-                    style={{ backgroundImage: `url(${image})` }}
-                  />
-                </button>
-              ))}
             </div>
           </div>
 
@@ -179,18 +159,7 @@ function ProductDetailPage() {
               <div className="flex items-start justify-between">
                 <div className="space-y-2">
                   <h2 className="text-4xl lg:text-5xl font-black tracking-tighter">{product.name}</h2>
-                  <p className="text-lg text-gray-400">{product.designer}</p>
-                  <div className="flex items-center space-x-4">
-                    <div className="flex items-center space-x-1">
-                      {[...Array(5)].map((_, i) => (
-                        <Star
-                          key={i}
-                          className={`w-4 h-4 ${i < Math.floor(product.rating) ? 'fill-white' : 'text-gray-600'}`}
-                        />
-                      ))}
-                    </div>
-                    <span className="text-sm text-gray-400">{product.rating} ({product.reviews} reviews)</span>
-                  </div>
+                  <p className="text-lg text-gray-400">{product.brand}</p>
                 </div>
                 <div className="text-right">
                   {product.originalPrice && (
@@ -212,25 +181,19 @@ function ProductDetailPage() {
                 </Link>
               </div>
               <div className="grid grid-cols-5 gap-2">
-                {product.sizes.map((size) => {
-                  const isAvailable = product.availableSizes.includes(size)
-                  return (
-                    <button
-                      key={size}
-                      onClick={() => isAvailable && setSelectedSize(size)}
-                      disabled={!isAvailable}
-                      className={`py-4 border transition-all ${
-                        selectedSize === size
-                          ? 'bg-white text-black border-white'
-                          : isAvailable
-                          ? 'border-white/20 hover:border-white/60'
-                          : 'border-gray-800 text-gray-600 cursor-not-allowed'
-                      }`}
-                    >
-                      {size}
-                    </button>
-                  )
-                })}
+                {product.sizes?.map((size) => (
+                  <button
+                    key={size}
+                    onClick={() => setSelectedSize(size)}
+                    className={`py-4 border transition-all ${
+                      selectedSize === size
+                        ? 'bg-white text-black border-white'
+                        : 'border-white/20 hover:border-white/60'
+                    }`}
+                  >
+                    {size}
+                  </button>
+                ))}
               </div>
             </div>
 
@@ -260,10 +223,10 @@ function ProductDetailPage() {
             {/* Add to Cart Button */}
             <div className="space-y-4">
               <Button
-                onClick={addToCart}
+                onClick={handleAddToCart}
                 className="w-full bg-white text-black hover:bg-gray-200 py-6 text-lg font-bold rounded-none"
               >
-                ADD TO CART
+                {addedToCart ? 'ADDED TO CART!' : 'ADD TO CART'}
               </Button>
               <div className="grid grid-cols-2 gap-4">
                 <Button
@@ -281,21 +244,9 @@ function ProductDetailPage() {
               </div>
             </div>
 
-            {/* Product Details */}
-            <div className="space-y-6">
-              <div>
-                <h3 className="text-lg font-bold mb-4">PRODUCT DETAILS</h3>
-                <ul className="space-y-2 text-gray-300">
-                  {product.details.map((detail, index) => (
-                    <li key={index} className="flex items-start">
-                      <div className="w-1 h-1 bg-white rounded-full mt-2 mr-3 flex-shrink-0" />
-                      {detail}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div className="grid grid-cols-3 gap-6 py-6 border-t border-white/10">
+            {/* Product Details - simplified */}
+            <div className="space-y-6 pt-6 border-t border-white/10">
+              <div className="grid grid-cols-3 gap-6">
                 <div className="text-center">
                   <Truck className="w-6 h-6 mx-auto mb-2" />
                   <p className="text-xs font-medium">FREE SHIPPING</p>
