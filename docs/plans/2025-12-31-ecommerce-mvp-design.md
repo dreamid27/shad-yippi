@@ -363,20 +363,20 @@ Domain:      Custom domain + SSL
 ### **PHASE 1: Foundation & Authentication (Week 1-2)**
 
 **Backend Tasks:**
-- [ ] Setup JWT authentication middleware
-- [ ] Enhance User entity with password_hash, refresh_token, role
-- [ ] Auth service: Register, Login, Logout, Refresh Token
-- [ ] Password hashing with bcrypt
-- [ ] Auth handlers & routes
-- [ ] Role-based authorization middleware (customer, admin)
+- [x] Setup JWT authentication middleware
+- [x] Enhance User entity with password_hash, refresh_token, role
+- [x] Auth service: Register, Login, Logout, Refresh Token
+- [x] Password hashing with bcrypt
+- [x] Auth handlers & routes
+- [x] Role-based authorization middleware (customer, admin)
 
 **Frontend Tasks:**
-- [ ] Refactor to feature-based architecture
-- [ ] Setup API client (axios with interceptors)
-- [ ] Create auth feature (login, register, profile)
-- [ ] Auth store (Zustand) with JWT persistence
-- [ ] Protected routes HOC
-- [ ] Auth context for user data
+- [x] Refactor to feature-based architecture
+- [x] Setup API client (axios with interceptors)
+- [x] Create auth feature (login, register, profile)
+- [x] Auth store (Zustand) with JWT persistence
+- [x] Protected routes HOC
+- [x] Auth context for user data
 
 **Deliverables:**
 - ✅ User registration & login working
