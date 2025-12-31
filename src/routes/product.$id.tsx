@@ -1,67 +1,42 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
-import { Search, ShoppingBag, ArrowLeft, Plus, Minus, Truck, Shield, RefreshCw, Star } from 'lucide-react'
-import { useState, useEffect } from 'react'
-import { Button } from '@/components/ui/button'
-import { useCart, type Product } from '@/hooks/use-cart'
+import { createFileRoute, Link } from "@tanstack/react-router"
+import {
+	Search,
+	ShoppingBag,
+	ArrowLeft,
+	Plus,
+	Minus,
+	Truck,
+	Shield,
+	RefreshCw,
+} from "lucide-react"
+import { useState } from "react"
+import { Button } from "@/components/ui/button"
+import { useCart, type Product } from "@/hooks/use-cart"
+import {
+	useProductDetail,
+	VariantSelector,
+	StockIndicator,
+	type ProductVariant,
+} from "@/features/products"
 
-export const Route = createFileRoute('/product/$id')({ component: ProductDetailPage })
+export const Route = createFileRoute("/product/$id")({
+	component: ProductDetailPage,
+})
 
 function ProductDetailPage() {
 	const { addItem, itemCount } = useCart()
 	const { id } = Route.useParams()
 	const [selectedImage, setSelectedImage] = useState(0)
-	const [selectedSize, setSelectedSize] = useState('')
+	const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(
+		null,
+	)
 	const [quantity, setQuantity] = useState(1)
 	const [isZoomed, setIsZoomed] = useState(false)
 	const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 })
 	const [addedToCart, setAddedToCart] = useState(false)
 
-	// Mock product data - in a real app, this would come from an API
-	const product: Product = {
-		id: id,
-		name: 'ARCHITECTURAL COAT',
-		price: 890,
-		image: 'https://images.unsplash.com/photo-1544966503-7e3c4c371b9c?w=1200&h=1800&fit=crop',
-		description: 'A statement piece that embodies brutalist architecture in garment form. This structured coat features exaggerated proportions, clean lines, and precision tailoring that creates a powerful silhouette.',
-		brand: 'ÆTHER',
-		sizes: ['XS', 'S', 'M', 'L', 'XL'],
-		category: 'Outerwear',
-		originalPrice: 1200,
-		badge: 'NEW',
-	}
-
-	const relatedProducts: Product[] = [
-		{
-			id: 2,
-			name: 'SCULPTURAL KNIT',
-			price: 420,
-			image: 'https://images.unsplash.com/photo-1434389677669-e08b4cac3106?w=600&h=900&fit=crop',
-			category: 'Knitwear'
-		},
-		{
-			id: 3,
-			name: 'GEOMETRIC TROUSER',
-			price: 520,
-			image: 'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=600&h=900&fit=crop',
-			category: 'Bottoms'
-		},
-		{
-			id: 5,
-			name: 'STRUCTURAL BOOT',
-			price: 650,
-			originalPrice: 850,
-			image: 'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=600&h=900&fit=crop',
-			category: 'Footwear',
-			badge: 'SALE'
-		},
-		{
-			id: 6,
-			name: 'GEOMETRIC BAG',
-			price: 320,
-			image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=600&h=900&fit=crop',
-			category: 'Accessories'
-		}
-	]
+	// Fetch product detail from API
+	const { data: product, isLoading, isError } = useProductDetail(id)
 
 	const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
 		const rect = e.currentTarget.getBoundingClientRect()
@@ -71,245 +46,361 @@ function ProductDetailPage() {
 	}
 
 	const handleAddToCart = () => {
-		if (!selectedSize) {
-			alert('Please select a size')
+		if (!selectedVariant) {
+			alert("Please select all product options")
 			return
 		}
-		// Add to cart with quantity
-		for (let i = 0; i < quantity; i++) {
-			addItem(product)
+
+		if (!selectedVariant.is_in_stock || selectedVariant.stock_quantity === 0) {
+			alert("This variant is currently out of stock")
+			return
 		}
+
+		if (quantity > selectedVariant.stock_quantity) {
+			alert(
+				`Only ${selectedVariant.stock_quantity} items available in stock`,
+			)
+			return
+		}
+
+		// TODO: Replace with real cart integration
+		// For now, use existing useCart hook (to be refactored in Day 7-8)
+		const cartProduct: Product = {
+			id: product!.id,
+			name: product!.name,
+			price: selectedVariant.final_price,
+			image: product!.image_urls[0],
+			category: product!.category.name,
+		}
+
+		for (let i = 0; i < quantity; i++) {
+			addItem(cartProduct)
+		}
+
 		setAddedToCart(true)
 		setTimeout(() => setAddedToCart(false), 2000)
 	}
 
-	if (!product) {
+	const handleVariantChange = (variant: ProductVariant | null) => {
+		setSelectedVariant(variant)
+		// Reset quantity when variant changes
+		if (variant) {
+			setQuantity(1)
+		}
+	}
+
+	// Loading state
+	if (isLoading) {
 		return (
-			<div className="min-h-screen bg-black text-white flex items-center justify-center">
-				<p>Product not found</p>
+			<div className="min-h-screen bg-black text-white">
+				<div className="sticky top-0 z-40 bg-black/90 backdrop-blur-lg border-b border-white/10">
+					<div className="max-w-7xl mx-auto px-6 py-4">
+						<div className="flex items-center justify-between">
+							<Link
+								to="/categories"
+								className="flex items-center space-x-2 hover:text-gray-300 transition-colors"
+							>
+								<ArrowLeft className="w-5 h-5" />
+								<span className="text-sm font-medium">BACK TO COLLECTIONS</span>
+							</Link>
+						</div>
+					</div>
+				</div>
+				<div className="flex items-center justify-center min-h-[60vh]">
+					<div className="animate-pulse space-y-4 text-center">
+						<div className="h-8 w-64 bg-gray-800 mx-auto" />
+						<p className="text-gray-400">Loading product...</p>
+					</div>
+				</div>
 			</div>
 		)
 	}
 
-  return (
-    <div className="min-h-screen bg-black text-white">
-      {/* Navigation Header */}
-      <div className="sticky top-0 z-40 bg-black/90 backdrop-blur-lg border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-6">
-              <Link to="/categories" className="flex items-center space-x-2 hover:text-gray-300 transition-colors">
-                <ArrowLeft className="w-5 h-5" />
-                <span className="text-sm font-medium">BACK TO COLLECTIONS</span>
-              </Link>
-              <div className="h-6 w-px bg-white/20" />
-              <h1 className="text-xl font-black tracking-tighter uppercase">{product.name}</h1>
-            </div>
+	// Error state
+	if (isError || !product) {
+		return (
+			<div className="min-h-screen bg-black text-white">
+				<div className="sticky top-0 z-40 bg-black/90 backdrop-blur-lg border-b border-white/10">
+					<div className="max-w-7xl mx-auto px-6 py-4">
+						<div className="flex items-center justify-between">
+							<Link
+								to="/categories"
+								className="flex items-center space-x-2 hover:text-gray-300 transition-colors"
+							>
+								<ArrowLeft className="w-5 h-5" />
+								<span className="text-sm font-medium">BACK TO COLLECTIONS</span>
+							</Link>
+						</div>
+					</div>
+				</div>
+				<div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
+					<p className="text-xl text-gray-400">Product not found</p>
+					<Button
+						onClick={() => window.location.reload()}
+						variant="outline"
+						className="border-white/20 text-white hover:bg-white/10 hover:text-white"
+					>
+						Try Again
+					</Button>
+				</div>
+			</div>
+		)
+	}
 
-            <div className="flex items-center space-x-4">
-              <button className="p-2 hover:bg-white/10 rounded-full transition-colors">
-                <Search className="w-5 h-5" />
-              </button>
-              <Link
-                to="/cart"
-                className="relative p-2 hover:bg-white/10 rounded-full transition-colors"
-              >
-                <ShoppingBag className="w-5 h-5" />
-                {itemCount > 0 && (
-                  <span className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 bg-white text-black text-xs font-black rounded-sm">
-                    {itemCount}
-                  </span>
-                )}
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
+	return (
+		<div className="min-h-screen bg-black text-white">
+			{/* Navigation Header */}
+			<div className="sticky top-0 z-40 bg-black/90 backdrop-blur-lg border-b border-white/10">
+				<div className="max-w-7xl mx-auto px-6 py-4">
+					<div className="flex items-center justify-between">
+						<div className="flex items-center space-x-6">
+							<Link
+								to="/categories"
+								className="flex items-center space-x-2 hover:text-gray-300 transition-colors"
+							>
+								<ArrowLeft className="w-5 h-5" />
+								<span className="text-sm font-medium">BACK TO COLLECTIONS</span>
+							</Link>
+							<div className="h-6 w-px bg-white/20" />
+							<h1 className="text-xl font-black tracking-tighter uppercase">
+								{product.name}
+							</h1>
+						</div>
 
-      {/* Product Detail */}
-      <div className="max-w-7xl mx-auto px-6 py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
-          {/* Product Images */}
-          <div className="space-y-4">
-            <div
-              className="relative h-[600px] lg:h-[800px] bg-gray-900 overflow-hidden cursor-zoom-in"
-              onMouseEnter={() => setIsZoomed(true)}
-              onMouseLeave={() => setIsZoomed(false)}
-              onMouseMove={handleMouseMove}
-            >
-              {product.badge && (
-                <div className="absolute top-4 left-4 z-20 bg-white text-black px-3 py-1 text-xs font-black tracking-wider">
-                  {product.badge}
-                </div>
-              )}
-              <div
-                className="absolute inset-0 bg-cover bg-center transition-transform duration-300"
-                style={{
-                  backgroundImage: `url(${product.image})`,
-                  transform: isZoomed ? 'scale(2)' : 'scale(1)',
-                  transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%`
-                }}
-              />
-            </div>
-          </div>
+						<div className="flex items-center space-x-4">
+							<button
+								type="button"
+								className="p-2 hover:bg-white/10 rounded-full transition-colors"
+							>
+								<Search className="w-5 h-5" />
+							</button>
+							<Link
+								to="/cart"
+								className="relative p-2 hover:bg-white/10 rounded-full transition-colors"
+							>
+								<ShoppingBag className="w-5 h-5" />
+								{itemCount > 0 && (
+									<span className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 bg-white text-black text-xs font-black rounded-sm">
+										{itemCount}
+									</span>
+								)}
+							</Link>
+						</div>
+					</div>
+				</div>
+			</div>
 
-          {/* Product Information */}
-          <div className="space-y-8">
-            <div className="space-y-4">
-              <div className="flex items-start justify-between">
-                <div className="space-y-2">
-                  <h2 className="text-4xl lg:text-5xl font-black tracking-tighter">{product.name}</h2>
-                  <p className="text-lg text-gray-400">{product.brand}</p>
-                </div>
-                <div className="text-right">
-                  {product.originalPrice && (
-                    <p className="text-lg text-gray-500 line-through">${product.originalPrice}</p>
-                  )}
-                  <p className="text-3xl font-bold">${product.price}</p>
-                </div>
-              </div>
+			{/* Product Detail */}
+			<div className="max-w-7xl mx-auto px-6 py-12">
+				<div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+					{/* Product Images */}
+					<div className="space-y-4">
+						<div
+							className="relative h-[600px] lg:h-[800px] bg-gray-900 overflow-hidden cursor-zoom-in"
+							onMouseEnter={() => setIsZoomed(true)}
+							onMouseLeave={() => setIsZoomed(false)}
+							onMouseMove={handleMouseMove}
+						>
+							{product.status === "published" && (
+								<div className="absolute top-4 left-4 z-20 bg-white text-black px-3 py-1 text-xs font-black tracking-wider">
+									NEW
+								</div>
+							)}
+							<div
+								className="absolute inset-0 bg-cover bg-center transition-transform duration-300"
+								style={{
+									backgroundImage: `url(${product.image_urls[selectedImage] || product.image_urls[0]})`,
+									transform: isZoomed ? "scale(2)" : "scale(1)",
+									transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%`,
+								}}
+							/>
+						</div>
 
-              <p className="text-lg leading-relaxed text-gray-300">{product.description}</p>
-            </div>
+						{/* Image thumbnails */}
+						{product.image_urls.length > 1 && (
+							<div className="grid grid-cols-4 gap-4">
+								{product.image_urls.slice(0, 4).map((img, idx) => (
+									<button
+										type="button"
+										key={idx}
+										onClick={() => setSelectedImage(idx)}
+										className={`aspect-square bg-gray-900 border-2 transition-all ${
+											selectedImage === idx
+												? "border-white"
+												: "border-white/20 hover:border-white/60"
+										}`}
+									>
+										<div
+											className="w-full h-full bg-cover bg-center"
+											style={{ backgroundImage: `url(${img})` }}
+										/>
+									</button>
+								))}
+							</div>
+						)}
+					</div>
 
-            {/* Size Selector */}
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <label className="text-sm font-medium tracking-wide">SELECT SIZE</label>
-                <Link to="/size-guide" className="text-sm text-gray-400 hover:text-white transition-colors">
-                  SIZE GUIDE
-                </Link>
-              </div>
-              <div className="grid grid-cols-5 gap-2">
-                {product.sizes?.map((size) => (
-                  <button
-                    key={size}
-                    onClick={() => setSelectedSize(size)}
-                    className={`py-4 border transition-all ${
-                      selectedSize === size
-                        ? 'bg-white text-black border-white'
-                        : 'border-white/20 hover:border-white/60'
-                    }`}
-                  >
-                    {size}
-                  </button>
-                ))}
-              </div>
-            </div>
+					{/* Product Information */}
+					<div className="space-y-8">
+						<div className="space-y-4">
+							<div className="flex items-start justify-between">
+								<div className="space-y-2">
+									<h2 className="text-4xl lg:text-5xl font-black tracking-tighter">
+										{product.name}
+									</h2>
+									<p className="text-lg text-gray-400">{product.brand.name}</p>
+								</div>
+								<div className="text-right">
+									{product.min_price !== product.max_price ? (
+										<p className="text-3xl font-bold">
+											${product.min_price} - ${product.max_price}
+										</p>
+									) : (
+										<p className="text-3xl font-bold">${product.base_price}</p>
+									)}
+								</div>
+							</div>
 
-            {/* Quantity Selector */}
-            <div className="space-y-4">
-              <label className="text-sm font-medium tracking-wide">QUANTITY</label>
-              <div className="flex items-center space-x-4">
-                <div className="flex items-center border border-white/20">
-                  <button
-                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="p-3 hover:bg-white/10 transition-colors"
-                  >
-                    <Minus className="w-4 h-4" />
-                  </button>
-                  <div className="w-16 text-center py-3">{quantity}</div>
-                  <button
-                    onClick={() => setQuantity(quantity + 1)}
-                    className="p-3 hover:bg-white/10 transition-colors"
-                  >
-                    <Plus className="w-4 h-4" />
-                  </button>
-                </div>
-                <p className="text-sm text-gray-400">12 items in stock</p>
-              </div>
-            </div>
+							<p className="text-lg leading-relaxed text-gray-300">
+								{product.description}
+							</p>
 
-            {/* Add to Cart Button */}
-            <div className="space-y-4">
-              <Button
-                onClick={handleAddToCart}
-                className="w-full bg-white text-black hover:bg-gray-200 py-6 text-lg font-bold rounded-none"
-              >
-                {addedToCart ? 'ADDED TO CART!' : 'ADD TO CART'}
-              </Button>
-              <div className="grid grid-cols-2 gap-4">
-                <Button
-                  variant="outline"
-                  className="border-white text-white hover:bg-white hover:text-black py-4 rounded-none"
-                >
-                  ADD TO WISHLIST
-                </Button>
-                <Button
-                  variant="outline"
-                  className="border-white text-white hover:bg-white hover:text-black py-4 rounded-none"
-                >
-                  SHARE
-                </Button>
-              </div>
-            </div>
+							{/* Stock indicator for product-level */}
+							{!selectedVariant && (
+								<div className="pt-2">
+									<StockIndicator
+										stockQuantity={product.has_stock ? 1 : 0}
+										isActive={product.status === "published"}
+										isInStock={product.has_stock}
+									/>
+								</div>
+							)}
+						</div>
 
-            {/* Product Details - simplified */}
-            <div className="space-y-6 pt-6 border-t border-white/10">
-              <div className="grid grid-cols-3 gap-6">
-                <div className="text-center">
-                  <Truck className="w-6 h-6 mx-auto mb-2" />
-                  <p className="text-xs font-medium">FREE SHIPPING</p>
-                  <p className="text-xs text-gray-400">On orders over $500</p>
-                </div>
-                <div className="text-center">
-                  <Shield className="w-6 h-6 mx-auto mb-2" />
-                  <p className="text-xs font-medium">SECURE PAYMENT</p>
-                  <p className="text-xs text-gray-400">Encrypted checkout</p>
-                </div>
-                <div className="text-center">
-                  <RefreshCw className="w-6 h-6 mx-auto mb-2" />
-                  <p className="text-xs font-medium">EASY RETURNS</p>
-                  <p className="text-xs text-gray-400">30 day policy</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+						{/* Variant Selector */}
+						{product.variants && product.variants.length > 0 && (
+							<VariantSelector
+								variants={product.variants}
+								onVariantChange={handleVariantChange}
+								selectedVariant={selectedVariant}
+							/>
+						)}
 
-      {/* Related Products */}
-      <section className="py-24 px-6 bg-gray-950">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-5xl md:text-6xl font-black mb-4 tracking-tighter">COMPLETE THE LOOK</h2>
-            <p className="text-xl text-gray-400">Pieces that complement this architectural design</p>
-          </div>
+						{/* Quantity Selector */}
+						{selectedVariant && (
+							<div className="space-y-4">
+								<label className="text-sm font-medium tracking-wide uppercase">
+									Quantity
+								</label>
+								<div className="flex items-center space-x-4">
+									<div className="flex items-center border border-white/20">
+										<button
+											type="button"
+											onClick={() => setQuantity(Math.max(1, quantity - 1))}
+											className="p-3 hover:bg-white/10 transition-colors"
+										>
+											<Minus className="w-4 h-4" />
+										</button>
+										<div className="w-16 text-center py-3">{quantity}</div>
+										<button
+											type="button"
+											onClick={() =>
+												setQuantity(
+													Math.min(
+														selectedVariant.stock_quantity,
+														quantity + 1,
+													),
+												)
+											}
+											className="p-3 hover:bg-white/10 transition-colors"
+										>
+											<Plus className="w-4 h-4" />
+										</button>
+									</div>
+									<p className="text-sm text-gray-400">
+										{selectedVariant.stock_quantity} items in stock
+									</p>
+								</div>
+							</div>
+						)}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {relatedProducts.map((relatedProduct) => (
-              <Link key={relatedProduct.id} to={`/product/${relatedProduct.id}`} className="group cursor-pointer">
-                <div className="relative h-[500px] bg-gray-900 overflow-hidden mb-4">
-                  {relatedProduct.badge && (
-                    <div className="absolute top-4 left-4 z-20 bg-white text-black px-3 py-1 text-xs font-black tracking-wider">
-                      {relatedProduct.badge}
-                    </div>
-                  )}
-                  <div
-                    className="absolute inset-0 opacity-80 group-hover:opacity-100 transition-all duration-700 transform group-hover:scale-105"
-                    style={{
-                      backgroundImage: `url(${relatedProduct.image})`,
-                      backgroundSize: 'cover',
-                      backgroundPosition: 'center',
-                    }}
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                </div>
-                <div className="space-y-1">
-                  <p className="text-xs text-gray-500 tracking-widest">{relatedProduct.category}</p>
-                  <h3 className="text-lg font-bold">{relatedProduct.name}</h3>
-                  <div className="flex items-center space-x-2">
-                    <p className="text-xl">${relatedProduct.price}</p>
-                    {relatedProduct.originalPrice && (
-                      <p className="text-sm text-gray-500 line-through">${relatedProduct.originalPrice}</p>
-                    )}
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-    </div>
-  )
+						{/* Add to Cart Button */}
+						<div className="space-y-4">
+							<Button
+								onClick={handleAddToCart}
+								disabled={
+									!selectedVariant ||
+									!selectedVariant.is_in_stock ||
+									selectedVariant.stock_quantity === 0
+								}
+								className="w-full bg-white text-black hover:bg-gray-200 py-6 text-lg font-bold rounded-none disabled:opacity-50 disabled:cursor-not-allowed"
+							>
+								{addedToCart
+									? "ADDED TO CART!"
+									: selectedVariant
+										? "ADD TO CART"
+										: "SELECT OPTIONS"}
+							</Button>
+							<div className="grid grid-cols-2 gap-4">
+								<Button
+									variant="outline"
+									className="border-white text-white hover:bg-white hover:text-black py-4 rounded-none"
+								>
+									ADD TO WISHLIST
+								</Button>
+								<Button
+									variant="outline"
+									className="border-white text-white hover:bg-white hover:text-black py-4 rounded-none"
+								>
+									SHARE
+								</Button>
+							</div>
+						</div>
+
+						{/* Product Details */}
+						<div className="space-y-6 pt-6 border-t border-white/10">
+							<div className="grid grid-cols-3 gap-6">
+								<div className="text-center">
+									<Truck className="w-6 h-6 mx-auto mb-2" />
+									<p className="text-xs font-medium">FREE SHIPPING</p>
+									<p className="text-xs text-gray-400">On orders over $500</p>
+								</div>
+								<div className="text-center">
+									<Shield className="w-6 h-6 mx-auto mb-2" />
+									<p className="text-xs font-medium">SECURE PAYMENT</p>
+									<p className="text-xs text-gray-400">Encrypted checkout</p>
+								</div>
+								<div className="text-center">
+									<RefreshCw className="w-6 h-6 mx-auto mb-2" />
+									<p className="text-xs font-medium">EASY RETURNS</p>
+									<p className="text-xs text-gray-400">30 day policy</p>
+								</div>
+							</div>
+
+							{/* Product Metadata */}
+							<div className="space-y-2 text-sm text-gray-400">
+								<p>
+									<span className="font-medium text-white">Category:</span>{" "}
+									{product.category.name}
+								</p>
+								<p>
+									<span className="font-medium text-white">Brand:</span>{" "}
+									{product.brand.name}
+								</p>
+								{selectedVariant && (
+									<p>
+										<span className="font-medium text-white">SKU:</span>{" "}
+										{selectedVariant.sku}
+									</p>
+								)}
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			{/* Related Products Section - TODO: Implement with real API in future */}
+			{/* For now, removed to avoid mock data */}
+		</div>
+	)
 }

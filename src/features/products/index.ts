@@ -10,9 +10,9 @@ export type {
 
 // Export components
 export { ProductSkeleton } from "./components/product-skeleton"
+export { VariantSelector } from "./components/variant-selector"
+export { StockIndicator } from "./components/stock-indicator"
 // export { ProductCard } from './components/product-card'
-// export { VariantSelector } from './components/variant-selector'
-// export { StockIndicator } from './components/stock-indicator'
 
 // Export hooks
 export { useProducts } from "./hooks/use-products"

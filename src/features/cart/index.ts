@@ -7,11 +7,11 @@ export type {
 	StockValidationError,
 } from "./types"
 
-// Export store (will be added later)
-// export { useCartStore } from './store/cart-store'
+// Export store
+export { useCartStore } from "./store/cart-store"
 
-// Export hooks (will be added later)
-// export { useCartSync } from './hooks/use-cart-sync'
+// Export hooks
+export { useCartSync } from "./hooks/use-cart-sync"
 // export { useCheckoutValidation } from './hooks/use-checkout-validation'
 
 // Export components (will be added later)
