@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
-import { HeaderBase } from "./header-base";
 import { BackButton } from "./back-button";
+import { HeaderBase } from "./header-base";
 
 interface MinimalHeaderProps {
 	showLogo?: boolean;

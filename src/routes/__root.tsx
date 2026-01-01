@@ -7,7 +7,8 @@ import {
 	Scripts,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
-
+import { Toaster } from "@/components/ui/sonner";
+import { ThemeProvider } from "@/components/layout";
 import { useCartSync } from "@/features/cart";
 
 import appCss from "../styles.css?url";
@@ -59,7 +60,7 @@ export const Route = createRootRoute({
 
 function RootDocument({ children }: { children: React.ReactNode }) {
 	return (
-		<html lang="en">
+		<html lang="en" suppressHydrationWarning>
 			<head>
 				<HeadContent />
 			</head>
@@ -87,12 +88,20 @@ function RootComponent() {
 	useCartSync();
 
 	return (
-		<QueryClientProvider client={queryClient}>
-			<div className="min-h-screen bg-background font-sans antialiased">
-				<main>
-					<Outlet />
-				</main>
-			</div>
-		</QueryClientProvider>
+		<ThemeProvider
+			attribute="class"
+			defaultTheme="system"
+			enableSystem
+			disableTransitionOnChange
+		>
+			<QueryClientProvider client={queryClient}>
+				<div className="min-h-screen bg-background font-sans antialiased">
+					<main>
+						<Outlet />
+					</main>
+					<Toaster />
+				</div>
+			</QueryClientProvider>
+		</ThemeProvider>
 	);
 }

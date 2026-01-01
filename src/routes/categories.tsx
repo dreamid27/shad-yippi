@@ -1,17 +1,38 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { X, ChevronDown, SlidersHorizontal } from "lucide-react";
-import { useState, useMemo, useRef, useEffect } from "react";
+import { ChevronDown, SlidersHorizontal, X } from "lucide-react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
+import { Pagination } from "@/components/common/pagination";
+import { PageHeader } from "@/components/layout/header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useCart } from "@/hooks/use-cart";
-import { PageHeader } from "@/components/layout/header";
 import {
-	useProducts,
-	ProductSkeleton,
+	type Product,
 	type ProductFilterParams,
+	ProductSkeleton,
+	useProducts,
 } from "@/features/products";
-import { Pagination } from "@/components/common/pagination";
+import { useCart } from "@/hooks/use-cart";
 import { useDebounce } from "@/hooks/use-debounce";
+import type { MenuItem } from "@/services/api";
+
+// Adapter function to convert Product to MenuItem for cart
+function productToCartItem(product: Product): MenuItem {
+	return {
+		id: product.id,
+		name: product.name,
+		price: product.min_price ?? product.base_price,
+		description: product.description,
+		category: product.category?.name ?? "uncategorized",
+		photos: product.image_urls,
+		dietary: {
+			vegan: false,
+			vegetarian: false,
+			glutenFree: false,
+			nutFree: false,
+			dairyFree: false,
+		},
+	};
+}
 
 export const Route = createFileRoute("/categories")({
 	component: CategoriesPage,
@@ -101,6 +122,7 @@ function FilterDrawer({
 				<div className="flex items-center justify-between p-6 border-b border-white/10">
 					<h2 className="text-xl font-black tracking-tight">FILTERS</h2>
 					<button
+						type="button"
 						onClick={onClose}
 						className="p-2 hover:bg-white/10 transition-colors"
 						aria-label="Close filters"
@@ -120,6 +142,7 @@ function FilterDrawer({
 							{brands.map((brand) => (
 								<button
 									key={brand}
+									type="button"
 									onClick={() =>
 										onBrandChange(selectedBrand === brand ? null : brand)
 									}
@@ -144,6 +167,7 @@ function FilterDrawer({
 							{sizeOptions.map((size) => (
 								<button
 									key={size}
+									type="button"
 									onClick={() => toggleSize(size)}
 									className={`w-12 h-12 text-sm font-bold tracking-wide transition-all border ${
 										selectedSizes.includes(size)
@@ -166,6 +190,7 @@ function FilterDrawer({
 							{priceRanges.map((range) => (
 								<button
 									key={range.id}
+									type="button"
 									onClick={() =>
 										onPriceRangeChange(
 											selectedPriceRange === range.id ? null : range.id,
@@ -207,8 +232,9 @@ function FilterDrawer({
 	);
 }
 
-function CategoriesPage() {
+export function CategoriesPage() {
 	const { addItem } = useCart();
+	const newsletterEmailId = useId();
 
 	// Filter state
 	const [category, setCategory] = useState<string | null>(null);
@@ -229,6 +255,54 @@ function CategoriesPage() {
 
 	// Debounce search
 	const debouncedSearch = useDebounce(searchInput, 300);
+
+	// Categories (TODO: fetch from API in future)
+	const categories = [
+		{ id: null, name: "ALL", description: "Complete collection" },
+		{ id: "outerwear", name: "OUTERWEAR", description: "Coats and jackets" },
+		{
+			id: "knitwear",
+			name: "KNITWEAR",
+			description: "Sweaters and cardigans",
+		},
+		{ id: "bottoms", name: "BOTTOMS", description: "Trousers and skirts" },
+		{ id: "shirts", name: "SHIRTS", description: "Shirts and blouses" },
+		{ id: "footwear", name: "FOOTWEAR", description: "Shoes and boots" },
+		{
+			id: "accessories",
+			name: "ACCESSORIES",
+			description: "Bags and small goods",
+		},
+	];
+
+	// Filter options (TODO: fetch from API in future)
+	const brands = [
+		"MONOLITH",
+		"ARCHITECTURAL",
+		"SCULPTURAL",
+		"GEOMETRIC",
+		"MINIMALIST",
+		"STRUCTURAL",
+	] as const;
+	const sizeOptions = ["XS", "S", "M", "L", "XL"] as const;
+	const priceRanges = useMemo(
+		() => [
+			{ id: "under-500", label: "Under $500", min: 0, max: 500 },
+			{ id: "500-1000", label: "$500 - $1000", min: 500, max: 1000 },
+			{ id: "over-1000", label: "Over $1000", min: 1000, max: Infinity },
+		],
+		[],
+	);
+
+	const sortOptions = useMemo(
+		() => [
+			{ id: "featured", label: "FEATURED" },
+			{ id: "price-low", label: "PRICE: LOW TO HIGH" },
+			{ id: "price-high", label: "PRICE: HIGH TO LOW" },
+			{ id: "name", label: "NAME: A-Z" },
+		],
+		[],
+	);
 
 	// Build API filters
 	const apiFilters: ProductFilterParams = useMemo(() => {
@@ -267,7 +341,16 @@ function CategoriesPage() {
 		// 'featured' = default sort from backend
 
 		return filters;
-	}, [debouncedSearch, category, brand, sizes, priceRange, sortBy, page]);
+	}, [
+		debouncedSearch,
+		category,
+		brand,
+		sizes,
+		priceRange,
+		sortBy,
+		page,
+		priceRanges,
+	]);
 
 	// Fetch products from API
 	const { data, isLoading, isError } = useProducts(apiFilters);
@@ -285,51 +368,10 @@ function CategoriesPage() {
 	}, [isFilterDrawerOpen]);
 
 	// Reset page when filters change
+	// biome-ignore lint/correctness/useExhaustiveDependencies: Dependencies intentionally included to reset page when filters change
 	useEffect(() => {
 		setPage(1);
 	}, [debouncedSearch, category, brand, sizes, priceRange, sortBy]);
-
-	// Categories (TODO: fetch from API in future)
-	const categories = [
-		{ id: null, name: "ALL", description: "Complete collection" },
-		{ id: "outerwear", name: "OUTERWEAR", description: "Coats and jackets" },
-		{
-			id: "knitwear",
-			name: "KNITWEAR",
-			description: "Sweaters and cardigans",
-		},
-		{ id: "bottoms", name: "BOTTOMS", description: "Trousers and skirts" },
-		{ id: "shirts", name: "SHIRTS", description: "Shirts and blouses" },
-		{ id: "footwear", name: "FOOTWEAR", description: "Shoes and boots" },
-		{
-			id: "accessories",
-			name: "ACCESSORIES",
-			description: "Bags and small goods",
-		},
-	];
-
-	// Filter options (TODO: fetch from API in future)
-	const brands = [
-		"MONOLITH",
-		"ARCHITECTURAL",
-		"SCULPTURAL",
-		"GEOMETRIC",
-		"MINIMALIST",
-		"STRUCTURAL",
-	];
-	const sizeOptions = ["XS", "S", "M", "L", "XL"];
-	const priceRanges = [
-		{ id: "under-500", label: "Under $500", min: 0, max: 500 },
-		{ id: "500-1000", label: "$500 - $1000", min: 500, max: 1000 },
-		{ id: "over-1000", label: "Over $1000", min: 1000, max: Infinity },
-	];
-
-	const sortOptions = [
-		{ id: "featured", label: "FEATURED" },
-		{ id: "price-low", label: "PRICE: LOW TO HIGH" },
-		{ id: "price-high", label: "PRICE: HIGH TO LOW" },
-		{ id: "name", label: "NAME: A-Z" },
-	];
 
 	// Active filters count
 	const activeFiltersCount =
@@ -359,7 +401,7 @@ function CategoriesPage() {
 		}
 
 		return filters;
-	}, [brand, sizes, priceRange]);
+	}, [brand, sizes, priceRange, priceRanges]);
 
 	const clearAllFilters = () => {
 		setBrand(null);
@@ -397,6 +439,7 @@ function CategoriesPage() {
 						{categories.map((cat) => (
 							<button
 								key={cat.id ?? "all"}
+								type="button"
 								onClick={() => setCategory(cat.id)}
 								className={`flex-shrink-0 px-4 py-2 text-sm font-medium tracking-wide transition-all whitespace-nowrap ${
 									category === cat.id
@@ -418,6 +461,7 @@ function CategoriesPage() {
 						{/* Sort Dropdown */}
 						<div className="relative">
 							<button
+								type="button"
 								onClick={() => setIsSortOpen(!isSortOpen)}
 								className="flex items-center gap-2 px-4 py-2 border border-white/20 hover:border-white/40 transition-colors text-sm font-medium tracking-wide"
 							>
@@ -441,6 +485,7 @@ function CategoriesPage() {
 										{sortOptions.map((option) => (
 											<button
 												key={option.id}
+												type="button"
 												onClick={() => {
 													setSortBy(option.id as typeof sortBy);
 													setIsSortOpen(false);
@@ -461,6 +506,7 @@ function CategoriesPage() {
 
 						{/* Filter Button */}
 						<button
+							type="button"
 							onClick={() => setIsFilterDrawerOpen(true)}
 							className="flex items-center gap-2 px-4 py-2 border border-white/20 hover:border-white/40 transition-colors text-sm font-medium tracking-wide"
 						>
@@ -492,6 +538,7 @@ function CategoriesPage() {
 							{activeFilters.map((filter) => (
 								<button
 									key={filter.type}
+									type="button"
 									onClick={() => removeFilter(filter.type)}
 									className="flex-shrink-0 flex items-center gap-2 px-3 py-1.5 bg-white/10 hover:bg-white/20 transition-colors text-sm font-medium tracking-wide group"
 								>
@@ -500,6 +547,7 @@ function CategoriesPage() {
 								</button>
 							))}
 							<button
+								type="button"
 								onClick={clearAllFilters}
 								className="flex-shrink-0 text-sm text-gray-400 hover:text-white transition-colors underline underline-offset-2"
 							>
@@ -561,6 +609,8 @@ function CategoriesPage() {
 													backgroundSize: "cover",
 													backgroundPosition: "center",
 												}}
+												role="img"
+												aria-label={product.name}
 											/>
 											<div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 											<div className="absolute bottom-4 left-4 right-4 transform translate-y-4 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300">
@@ -568,7 +618,7 @@ function CategoriesPage() {
 													onClick={(e) => {
 														e.preventDefault();
 														e.stopPropagation();
-														addItem(product as any);
+														addItem(productToCartItem(product));
 													}}
 													className="w-full bg-white text-black hover:bg-gray-200 rounded-none font-bold tracking-wide"
 												>
@@ -638,6 +688,8 @@ function CategoriesPage() {
 					</p>
 					<div className="flex flex-col sm:flex-row gap-3">
 						<Input
+							id={newsletterEmailId}
+							name="email"
 							type="email"
 							placeholder="EMAIL ADDRESS"
 							className="flex-1 bg-transparent border-white/20 text-white placeholder:text-gray-500 rounded-none h-12"

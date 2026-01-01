@@ -1,9 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 import { HomeHeader } from "@/components/layout/header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useAuthStore } from "@/features/auth/store/auth-store";
+import { useCartStore } from "@/features/cart/store/cart-store";
 
 export const Route = createFileRoute("/")({ component: HomePage });
 
@@ -14,10 +17,38 @@ function HomePage() {
 	const [isProductsVisible, setIsProductsVisible] = useState(false);
 	const [isBrandStoryVisible, setIsBrandStoryVisible] = useState(false);
 
+	// Cart & Auth state
+	const addGuestItem = useCartStore((state) => state.addGuestItem);
+	const addItem = useCartStore((state) => state.addItem);
+	const accessToken = useAuthStore((state) => state.accessToken);
+	const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+
 	const heroRef = useRef<HTMLDivElement>(null);
 	const collectionsRef = useRef<HTMLDivElement>(null);
 	const productsRef = useRef<HTMLDivElement>(null);
 	const brandStoryRef = useRef<HTMLDivElement>(null);
+
+	// Handle add to cart
+	const handleAddToCart = async (productId: string, productName: string) => {
+		try {
+			if (isAuthenticated && accessToken) {
+				// Authenticated user - add to server cart
+				await addItem(accessToken, productId, 1);
+			} else {
+				// Guest user - add to local cart
+				addGuestItem(productId, 1);
+			}
+
+			toast.success(`${productName} added to cart!`, {
+				description: "Continue shopping or view your cart",
+			});
+		} catch (error) {
+			toast.error("Failed to add item to cart", {
+				description:
+					error instanceof Error ? error.message : "Please try again",
+			});
+		}
+	};
 
 	useEffect(() => {
 		const handleScroll = () => setScrollY(window.scrollY);
@@ -84,6 +115,7 @@ function HomePage() {
 	const products = [
 		{
 			id: 1,
+			variant_id: "variant-1",
 			name: "ARCHITECTURAL COAT",
 			price: 890,
 			image:
@@ -92,6 +124,7 @@ function HomePage() {
 		},
 		{
 			id: 2,
+			variant_id: "variant-2",
 			name: "SCULPTURAL KNIT",
 			price: 420,
 			image:
@@ -100,6 +133,7 @@ function HomePage() {
 		},
 		{
 			id: 3,
+			variant_id: "variant-3",
 			name: "GEOMETRIC TROUSER",
 			price: 520,
 			image:
@@ -108,6 +142,7 @@ function HomePage() {
 		},
 		{
 			id: 4,
+			variant_id: "variant-4",
 			name: "MINIMALIST SHIRT",
 			price: 380,
 			image:
@@ -358,7 +393,14 @@ function HomePage() {
 									/>
 									<div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 									<div className="absolute bottom-4 left-4 right-4 transform translate-y-4 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300">
-										<Button className="w-full bg-white text-black hover:bg-gray-200 rounded-none">
+										<Button
+											onClick={(e) => {
+												e.preventDefault();
+												e.stopPropagation();
+												handleAddToCart(product.variant_id, product.name);
+											}}
+											className="w-full bg-white text-black hover:bg-gray-200 rounded-none"
+										>
 											ADD TO CART
 										</Button>
 									</div>

@@ -1,7 +1,10 @@
-import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Search, Menu, X } from "lucide-react";
+import { Menu, Search, X } from "lucide-react";
+import { useState } from "react";
+import { ThemeToggle } from "../theme-toggle";
+import { AuthButton } from "./auth-button";
 import { HeaderBase } from "./header-base";
+import { SearchModal } from "./search-modal";
 
 interface HomeHeaderProps {
 	scrollY?: number;
@@ -9,6 +12,7 @@ interface HomeHeaderProps {
 
 export function HomeHeader({ scrollY = 0 }: HomeHeaderProps) {
 	const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+	const [isSearchOpen, setIsSearchOpen] = useState(false);
 
 	return (
 		<>
@@ -62,14 +66,18 @@ export function HomeHeader({ scrollY = 0 }: HomeHeaderProps) {
 					</Link>
 				</div>
 
-				{/* Search & Mobile Menu Toggle */}
+				{/* Search, Theme, Auth, & Mobile Menu Toggle */}
 				<div className="flex items-center space-x-4">
 					<button
 						type="button"
 						className="p-2 hover:bg-white/10 rounded-full transition-colors"
+						aria-label="Search"
+						onClick={() => setIsSearchOpen(true)}
 					>
 						<Search className="w-5 h-5" />
 					</button>
+					<ThemeToggle />
+					<AuthButton />
 					<button
 						type="button"
 						className="md:hidden p-2 hover:bg-white/10 rounded-full transition-colors"
@@ -131,9 +139,20 @@ export function HomeHeader({ scrollY = 0 }: HomeHeaderProps) {
 						>
 							EDITORIAL
 						</Link>
+
+						{/* Auth Button in Mobile Menu */}
+						<div className="pt-4 border-t border-white/10">
+							<AuthButton />
+						</div>
 					</div>
 				</div>
 			)}
+
+			{/* Search Modal */}
+			<SearchModal
+				isOpen={isSearchOpen}
+				onClose={() => setIsSearchOpen(false)}
+			/>
 		</>
 	);
 }

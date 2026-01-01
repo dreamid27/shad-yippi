@@ -1,7 +1,7 @@
-import { useState } from "react";
 import { Search } from "lucide-react";
-import { HeaderBase } from "./header-base";
+import { useState } from "react";
 import { BackButton } from "./back-button";
+import { HeaderBase } from "./header-base";
 import { SearchInput } from "./search-input";
 
 interface PageHeaderProps {
