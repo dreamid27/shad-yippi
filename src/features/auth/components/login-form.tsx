@@ -11,6 +11,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useLogin } from "../hooks/use-login";
+import { toast } from "sonner";
+import { Link } from "@tanstack/react-router";
 
 export function LoginForm() {
 	const [email, setEmail] = useState("");
@@ -25,24 +27,32 @@ export function LoginForm() {
 			{ email, password },
 			{
 				onSuccess: () => {
+					toast.success("Login successful! Welcome back.");
 					navigate({ to: "/" });
+				},
+				onError: (error) => {
+					toast.error(error.message || "Login failed. Please try again.");
 				},
 			},
 		);
 	};
 
 	return (
-		<Card className="w-full max-w-md">
+		<Card className="w-full max-w-md border-white/10 bg-black/50 backdrop-blur-sm">
 			<CardHeader>
-				<CardTitle>Login</CardTitle>
-				<CardDescription>
+				<CardTitle className="text-2xl font-black tracking-tight">
+					Welcome Back
+				</CardTitle>
+				<CardDescription className="text-gray-400">
 					Enter your email and password to access your account
 				</CardDescription>
 			</CardHeader>
 			<CardContent>
 				<form onSubmit={handleSubmit} className="space-y-4">
 					<div className="space-y-2">
-						<Label htmlFor="email">Email</Label>
+						<Label htmlFor="email" className="text-gray-300">
+							Email
+						</Label>
 						<Input
 							id="email"
 							type="email"
@@ -50,10 +60,13 @@ export function LoginForm() {
 							value={email}
 							onChange={(e) => setEmail(e.target.value)}
 							required
+							className="bg-white/5 border-white/10"
 						/>
 					</div>
 					<div className="space-y-2">
-						<Label htmlFor="password">Password</Label>
+						<Label htmlFor="password" className="text-gray-300">
+							Password
+						</Label>
 						<Input
 							id="password"
 							type="password"
@@ -61,14 +74,25 @@ export function LoginForm() {
 							value={password}
 							onChange={(e) => setPassword(e.target.value)}
 							required
+							className="bg-white/5 border-white/10"
 						/>
 					</div>
-					{login.isError && (
-						<p className="text-sm text-red-500">{login.error?.message}</p>
-					)}
-					<Button type="submit" className="w-full" disabled={login.isPending}>
-						{login.isPending ? "Logging in..." : "Login"}
+					<Button
+						type="submit"
+						className="w-full bg-white text-black hover:bg-gray-200 rounded-none h-11 font-bold tracking-wide"
+						disabled={login.isPending}
+					>
+						{login.isPending ? "Logging in..." : "LOGIN"}
 					</Button>
+					<p className="text-center text-sm text-gray-400">
+						Don't have an account?{" "}
+						<Link
+							to="/register"
+							className="text-white hover:underline font-medium"
+						>
+							Register
+						</Link>
+					</p>
 				</form>
 			</CardContent>
 		</Card>

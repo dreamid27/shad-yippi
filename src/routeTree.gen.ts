@@ -19,6 +19,7 @@ import { Route as AddressesRouteImport } from './routes/addresses'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProductIdRouteImport } from './routes/product.$id'
+import { Route as DashboardDashboardRouteImport } from './routes/_dashboard/dashboard'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as OrdersSuccessIdRouteImport } from './routes/orders.success.$id'
 import { Route as OrdersFailedIdRouteImport } from './routes/orders.failed.$id'
@@ -77,6 +78,11 @@ const IndexRoute = IndexRouteImport.update({
 const ProductIdRoute = ProductIdRouteImport.update({
   id: '/product/$id',
   path: '/product/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardDashboardRoute = DashboardDashboardRouteImport.update({
+  id: '/_dashboard/dashboard',
+  path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
@@ -140,6 +146,7 @@ export interface FileRoutesByFullPath {
   '/orders': typeof OrdersRouteWithChildren
   '/register': typeof RegisterRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/dashboard': typeof DashboardDashboardRoute
   '/product/$id': typeof ProductIdRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
@@ -161,6 +168,7 @@ export interface FileRoutesByTo {
   '/orders': typeof OrdersRouteWithChildren
   '/register': typeof RegisterRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/dashboard': typeof DashboardDashboardRoute
   '/product/$id': typeof ProductIdRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
@@ -184,6 +192,7 @@ export interface FileRoutesById {
   '/orders': typeof OrdersRouteWithChildren
   '/register': typeof RegisterRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
+  '/_dashboard/dashboard': typeof DashboardDashboardRoute
   '/product/$id': typeof ProductIdRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
@@ -207,6 +216,7 @@ export interface FileRouteTypes {
     | '/orders'
     | '/register'
     | '/profile'
+    | '/dashboard'
     | '/product/$id'
     | '/demo/api/names'
     | '/demo/start/api-request'
@@ -228,6 +238,7 @@ export interface FileRouteTypes {
     | '/orders'
     | '/register'
     | '/profile'
+    | '/dashboard'
     | '/product/$id'
     | '/demo/api/names'
     | '/demo/start/api-request'
@@ -250,6 +261,7 @@ export interface FileRouteTypes {
     | '/orders'
     | '/register'
     | '/_authenticated/profile'
+    | '/_dashboard/dashboard'
     | '/product/$id'
     | '/demo/api/names'
     | '/demo/start/api-request'
@@ -272,6 +284,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   OrdersRoute: typeof OrdersRouteWithChildren
   RegisterRoute: typeof RegisterRoute
+  DashboardDashboardRoute: typeof DashboardDashboardRoute
   ProductIdRoute: typeof ProductIdRoute
   DemoApiNamesRoute: typeof DemoApiNamesRoute
   DemoStartApiRequestRoute: typeof DemoStartApiRequestRoute
@@ -352,6 +365,13 @@ declare module '@tanstack/react-router' {
       path: '/product/$id'
       fullPath: '/product/$id'
       preLoaderRoute: typeof ProductIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_dashboard/dashboard': {
+      id: '/_dashboard/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardDashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/profile': {
@@ -462,6 +482,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   OrdersRoute: OrdersRouteWithChildren,
   RegisterRoute: RegisterRoute,
+  DashboardDashboardRoute: DashboardDashboardRoute,
   ProductIdRoute: ProductIdRoute,
   DemoApiNamesRoute: DemoApiNamesRoute,
   DemoStartApiRequestRoute: DemoStartApiRequestRoute,

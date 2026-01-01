@@ -11,6 +11,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useRegister } from "../hooks/use-register";
+import { toast } from "sonner";
+import { Link } from "@tanstack/react-router";
 
 export function RegisterForm() {
 	const [formData, setFormData] = useState({
@@ -27,7 +29,11 @@ export function RegisterForm() {
 
 		register.mutate(formData, {
 			onSuccess: () => {
+				toast.success("Account created successfully! Welcome to SHAD YIPPI.");
 				navigate({ to: "/" });
+			},
+			onError: (error) => {
+				toast.error(error.message || "Registration failed. Please try again.");
 			},
 		});
 	};
@@ -40,17 +46,21 @@ export function RegisterForm() {
 	};
 
 	return (
-		<Card className="w-full max-w-md">
+		<Card className="w-full max-w-md border-white/10 bg-black/50 backdrop-blur-sm">
 			<CardHeader>
-				<CardTitle>Create Account</CardTitle>
-				<CardDescription>
+				<CardTitle className="text-2xl font-black tracking-tight">
+					Create Account
+				</CardTitle>
+				<CardDescription className="text-gray-400">
 					Enter your information to create a new account
 				</CardDescription>
 			</CardHeader>
 			<CardContent>
 				<form onSubmit={handleSubmit} className="space-y-4">
 					<div className="space-y-2">
-						<Label htmlFor="name">Full Name</Label>
+						<Label htmlFor="name" className="text-gray-300">
+							Full Name
+						</Label>
 						<Input
 							id="name"
 							name="name"
@@ -59,10 +69,13 @@ export function RegisterForm() {
 							value={formData.name}
 							onChange={handleChange}
 							required
+							className="bg-white/5 border-white/10"
 						/>
 					</div>
 					<div className="space-y-2">
-						<Label htmlFor="email">Email</Label>
+						<Label htmlFor="email" className="text-gray-300">
+							Email
+						</Label>
 						<Input
 							id="email"
 							name="email"
@@ -71,10 +84,13 @@ export function RegisterForm() {
 							value={formData.email}
 							onChange={handleChange}
 							required
+							className="bg-white/5 border-white/10"
 						/>
 					</div>
 					<div className="space-y-2">
-						<Label htmlFor="phone">Phone (optional)</Label>
+						<Label htmlFor="phone" className="text-gray-300">
+							Phone (optional)
+						</Label>
 						<Input
 							id="phone"
 							name="phone"
@@ -82,10 +98,13 @@ export function RegisterForm() {
 							placeholder="+62812345678"
 							value={formData.phone}
 							onChange={handleChange}
+							className="bg-white/5 border-white/10"
 						/>
 					</div>
 					<div className="space-y-2">
-						<Label htmlFor="password">Password</Label>
+						<Label htmlFor="password" className="text-gray-300">
+							Password
+						</Label>
 						<Input
 							id="password"
 							name="password"
@@ -95,18 +114,25 @@ export function RegisterForm() {
 							onChange={handleChange}
 							required
 							minLength={6}
+							className="bg-white/5 border-white/10"
 						/>
 					</div>
-					{register.isError && (
-						<p className="text-sm text-red-500">{register.error?.message}</p>
-					)}
 					<Button
 						type="submit"
-						className="w-full"
+						className="w-full bg-white text-black hover:bg-gray-200 rounded-none h-11 font-bold tracking-wide"
 						disabled={register.isPending}
 					>
-						{register.isPending ? "Creating account..." : "Create Account"}
+						{register.isPending ? "Creating account..." : "CREATE ACCOUNT"}
 					</Button>
+					<p className="text-center text-sm text-gray-400">
+						Already have an account?{" "}
+						<Link
+							to="/login"
+							className="text-white hover:underline font-medium"
+						>
+							Login
+						</Link>
+					</p>
 				</form>
 			</CardContent>
 		</Card>

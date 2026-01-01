@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { useAuthStore } from "@/features/auth";
 import { useCartStore } from "../store/cart-store";
 
 /**
@@ -6,17 +7,16 @@ import { useCartStore } from "../store/cart-store";
  *
  * Usage:
  * - Call this hook in root component (e.g., _app.tsx or main layout)
- * - Pass accessToken when user is authenticated
  * - Hook will automatically merge guest cart to server when user logs in
  * - Hook will load server cart when user is already logged in
  *
- * @param accessToken - User's access token (null if not logged in)
- * @param isAuthenticated - Whether user is currently authenticated
+ * Behavior:
+ * - On login: Merges guest cart (localStorage) with server cart
+ * - On refresh (already logged in): Loads server cart
+ * - On logout: Resets sync flag for next login
  */
-export function useCartSync(
-	accessToken: string | null,
-	isAuthenticated: boolean,
-) {
+export function useCartSync() {
+	const { isAuthenticated, accessToken } = useAuthStore();
 	const { syncCart, loadCart, guestCart } = useCartStore();
 	const hasTriggeredSync = useRef(false);
 	const previousAuthState = useRef(isAuthenticated);

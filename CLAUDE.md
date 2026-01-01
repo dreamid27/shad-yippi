@@ -133,6 +133,37 @@ features/products/
 
 ## Rules & Best Practices
 
+### 0. Code Quality Checks
+
+**MANDATORY: Run Lint & Format Checks After Every Change**
+
+Every time you make changes to the codebase, you MUST run lint and format checks to ensure code quality:
+
+```bash
+# Run both lint and format checks together
+bun --bun run check
+
+# Or run separately
+bun --bun run lint       # Check for linting errors
+bun --bun run format     # Format code with Biome
+```
+
+**Rules:**
+- Run `bun --bun run check` after completing any code changes
+- Fix all linting errors before committing
+- Ensure Biome formatting is applied to all modified files
+- No exceptions - code with linting errors = PR REJECTED
+
+**Pre-commit Workflow:**
+```bash
+# 1. Make your changes
+# 2. Run checks
+bun --bun run check
+
+# 3. If checks pass, commit your changes
+# 4. If checks fail, fix errors and repeat from step 2
+```
+
 ### 1. Feature Organization
 
 **Core Principles:**

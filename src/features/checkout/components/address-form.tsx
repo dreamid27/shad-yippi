@@ -3,99 +3,118 @@
  * Form for creating and editing addresses
  */
 
-import { useState } from 'react'
-import type { Address, CreateAddressRequest, UpdateAddressRequest } from '../types'
+import { useState } from "react";
+import type {
+	Address,
+	CreateAddressRequest,
+	UpdateAddressRequest,
+} from "../types";
 
 interface AddressFormProps {
-	address?: Address
-	onSubmit: (data: CreateAddressRequest | UpdateAddressRequest) => Promise<void>
-	onCancel?: () => void
-	loading?: boolean
-	submitButtonText?: string
+	address?: Address;
+	onSubmit: (
+		data: CreateAddressRequest | UpdateAddressRequest,
+	) => Promise<void>;
+	onCancel?: () => void;
+	loading?: boolean;
+	submitButtonText?: string;
 }
 
 // Mock provinces - replace with RajaOngkir API
 const PROVINCES = [
-	{ id: '1', name: 'DKI Jakarta' },
-	{ id: '2', name: 'Jawa Barat' },
-	{ id: '3', name: 'Jawa Tengah' },
-	{ id: '4', name: 'Jawa Timur' },
-	{ id: '5', name: 'Banten' },
-	{ id: '6', name: 'DI Yogyakarta' },
-]
+	{ id: "1", name: "DKI Jakarta" },
+	{ id: "2", name: "Jawa Barat" },
+	{ id: "3", name: "Jawa Tengah" },
+	{ id: "4", name: "Jawa Timur" },
+	{ id: "5", name: "Banten" },
+	{ id: "6", name: "DI Yogyakarta" },
+];
 
 // Mock cities - replace with RajaOngkir API
 const CITIES: Record<string, Array<{ id: string; name: string }>> = {
-	'1': [
-		{ id: '11', name: 'Jakarta Pusat' },
-		{ id: '12', name: 'Jakarta Utara' },
-		{ id: '13', name: 'Jakarta Barat' },
-		{ id: '14', name: 'Jakarta Selatan' },
-		{ id: '15', name: 'Jakarta Timur' },
+	"1": [
+		{ id: "11", name: "Jakarta Pusat" },
+		{ id: "12", name: "Jakarta Utara" },
+		{ id: "13", name: "Jakarta Barat" },
+		{ id: "14", name: "Jakarta Selatan" },
+		{ id: "15", name: "Jakarta Timur" },
 	],
-	'2': [
-		{ id: '21', name: 'Bandung' },
-		{ id: '22', name: 'Bekasi' },
-		{ id: '23', name: 'Bogor' },
+	"2": [
+		{ id: "21", name: "Bandung" },
+		{ id: "22", name: "Bekasi" },
+		{ id: "23", name: "Bogor" },
 	],
-	'3': [{ id: '31', name: 'Semarang' }, { id: '32', name: 'Solo' }],
-	'4': [{ id: '41', name: 'Surabaya' }, { id: '42', name: 'Malang' }],
-	'5': [{ id: '51', name: 'Tangerang' }],
-	'6': [{ id: '61', name: 'Yogyakarta' }],
-}
+	"3": [
+		{ id: "31", name: "Semarang" },
+		{ id: "32", name: "Solo" },
+	],
+	"4": [
+		{ id: "41", name: "Surabaya" },
+		{ id: "42", name: "Malang" },
+	],
+	"5": [{ id: "51", name: "Tangerang" }],
+	"6": [{ id: "61", name: "Yogyakarta" }],
+};
 
-const LABELS = ['Home', 'Office', 'Apartment', 'Other']
+const LABELS = ["Home", "Office", "Apartment", "Other"];
 
 export function AddressForm({
 	address,
 	onSubmit,
 	onCancel,
 	loading = false,
-	submitButtonText = 'Save Address',
+	submitButtonText = "Save Address",
 }: AddressFormProps) {
-	const isEditing = !!address
+	const isEditing = !!address;
 
 	// Form state
-	const [label, setLabel] = useState(address?.label || '')
-	const [recipientName, setRecipientName] = useState(address?.recipient_name || '')
-	const [phone, setPhone] = useState(address?.phone || '')
-	const [addressLine1, setAddressLine1] = useState(address?.address_line1 || '')
-	const [addressLine2, setAddressLine2] = useState(address?.address_line2 || '')
-	const [provinceId, setProvinceId] = useState(address?.province_id || '')
-	const [cityId, setCityId] = useState(address?.city_id || '')
-	const [district, setDistrict] = useState(address?.district || '')
-	const [postalCode, setPostalCode] = useState(address?.postal_code || '')
-	const [isDefault, setIsDefault] = useState(address?.is_default || false)
+	const [label, setLabel] = useState(address?.label || "");
+	const [recipientName, setRecipientName] = useState(
+		address?.recipient_name || "",
+	);
+	const [phone, setPhone] = useState(address?.phone || "");
+	const [addressLine1, setAddressLine1] = useState(
+		address?.address_line1 || "",
+	);
+	const [addressLine2, setAddressLine2] = useState(
+		address?.address_line2 || "",
+	);
+	const [provinceId, setProvinceId] = useState(address?.province_id || "");
+	const [cityId, setCityId] = useState(address?.city_id || "");
+	const [district, setDistrict] = useState(address?.district || "");
+	const [postalCode, setPostalCode] = useState(address?.postal_code || "");
+	const [isDefault, setIsDefault] = useState(address?.is_default || false);
 
 	// Validation errors
-	const [errors, setErrors] = useState<Record<string, string>>({})
+	const [errors, setErrors] = useState<Record<string, string>>({});
 
 	const validateForm = () => {
-		const newErrors: Record<string, string> = {}
+		const newErrors: Record<string, string> = {};
 
-		if (!label.trim()) newErrors.label = 'Label is required'
-		if (!recipientName.trim()) newErrors.recipientName = 'Recipient name is required'
-		if (!phone.trim()) newErrors.phone = 'Phone number is required'
-		if (!addressLine1.trim()) newErrors.addressLine1 = 'Address is required'
-		if (!provinceId) newErrors.provinceId = 'Province is required'
-		if (!cityId) newErrors.cityId = 'City is required'
-		if (!postalCode.trim()) newErrors.postalCode = 'Postal code is required'
+		if (!label.trim()) newErrors.label = "Label is required";
+		if (!recipientName.trim())
+			newErrors.recipientName = "Recipient name is required";
+		if (!phone.trim()) newErrors.phone = "Phone number is required";
+		if (!addressLine1.trim()) newErrors.addressLine1 = "Address is required";
+		if (!provinceId) newErrors.provinceId = "Province is required";
+		if (!cityId) newErrors.cityId = "City is required";
+		if (!postalCode.trim()) newErrors.postalCode = "Postal code is required";
 
-		setErrors(newErrors)
-		return Object.keys(newErrors).length === 0
-	}
+		setErrors(newErrors);
+		return Object.keys(newErrors).length === 0;
+	};
 
 	const handleSubmit = async (e: React.FormEvent) => {
-		e.preventDefault()
+		e.preventDefault();
 
-		if (!validateForm()) return
+		if (!validateForm()) return;
 
-		const province = PROVINCES.find((p) => p.id === provinceId)
-		const city = CITIES[provinceId]?.find((c) => c.id === cityId)
+		const province = PROVINCES.find((p) => p.id === provinceId);
+		const city = CITIES[provinceId]?.find((c) => c.id === cityId);
 
 		if (!province || !city) {
-			setErrors({ provinceId: 'Invalid province or city' })
-			return
+			setErrors({ provinceId: "Invalid province or city" });
+			return;
 		}
 
 		const data: CreateAddressRequest | UpdateAddressRequest = {
@@ -111,12 +130,12 @@ export function AddressForm({
 			district: district.trim() || undefined,
 			postal_code: postalCode.trim(),
 			is_default: isDefault,
-		}
+		};
 
-		await onSubmit(data)
-	}
+		await onSubmit(data);
+	};
 
-	const availableCities = provinceId ? CITIES[provinceId] || [] : []
+	const availableCities = provinceId ? CITIES[provinceId] || [] : [];
 
 	return (
 		<form onSubmit={handleSubmit} className="space-y-6">
@@ -133,15 +152,17 @@ export function AddressForm({
 							onClick={() => setLabel(presetLabel)}
 							className={`px-4 py-2 rounded-lg border-2 transition-all ${
 								label === presetLabel
-									? 'border-violet-500 bg-violet-50 text-violet-700 font-bold'
-									: 'border-gray-200 bg-white text-gray-700 hover:border-violet-300'
+									? "border-violet-500 bg-violet-50 text-violet-700 font-bold"
+									: "border-gray-200 bg-white text-gray-700 hover:border-violet-300"
 							}`}
 						>
 							{presetLabel}
 						</button>
 					))}
 				</div>
-				{errors.label && <p className="text-sm text-red-600 mt-1">{errors.label}</p>}
+				{errors.label && (
+					<p className="text-sm text-red-600 mt-1">{errors.label}</p>
+				)}
 			</div>
 
 			{/* Recipient Name */}
@@ -175,7 +196,9 @@ export function AddressForm({
 					className="w-full px-4 py-3 bg-white border-2 border-gray-200 rounded-xl focus:border-violet-500 focus:ring-2 focus:ring-violet-200 outline-none transition-all"
 					disabled={loading}
 				/>
-				{errors.phone && <p className="text-sm text-red-600 mt-1">{errors.phone}</p>}
+				{errors.phone && (
+					<p className="text-sm text-red-600 mt-1">{errors.phone}</p>
+				)}
 			</div>
 
 			{/* Address Line 1 */}
@@ -220,8 +243,8 @@ export function AddressForm({
 					<select
 						value={provinceId}
 						onChange={(e) => {
-							setProvinceId(e.target.value)
-							setCityId('') // Reset city when province changes
+							setProvinceId(e.target.value);
+							setCityId(""); // Reset city when province changes
 						}}
 						className="w-full px-4 py-3 bg-white border-2 border-gray-200 rounded-xl focus:border-violet-500 focus:ring-2 focus:ring-violet-200 outline-none transition-all"
 						disabled={loading}
@@ -255,7 +278,9 @@ export function AddressForm({
 							</option>
 						))}
 					</select>
-					{errors.cityId && <p className="text-sm text-red-600 mt-1">{errors.cityId}</p>}
+					{errors.cityId && (
+						<p className="text-sm text-red-600 mt-1">{errors.cityId}</p>
+					)}
 				</div>
 			</div>
 
@@ -304,7 +329,10 @@ export function AddressForm({
 					disabled={loading}
 					className="w-5 h-5 rounded border-2 border-gray-300 text-violet-600 focus:ring-violet-500 focus:ring-2"
 				/>
-				<label htmlFor="isDefault" className="text-sm font-medium text-gray-900">
+				<label
+					htmlFor="isDefault"
+					className="text-sm font-medium text-gray-900"
+				>
 					Set as default address
 				</label>
 			</div>
@@ -337,5 +365,5 @@ export function AddressForm({
 				</button>
 			</div>
 		</form>
-	)
+	);
 }

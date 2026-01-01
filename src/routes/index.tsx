@@ -1,15 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Search, ShoppingBag, Menu, X, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
+import { HomeHeader } from "@/components/layout/header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useCart } from "@/hooks/use-cart";
 
 export const Route = createFileRoute("/")({ component: HomePage });
 
 function HomePage() {
-	const { itemCount } = useCart();
-	const [isMenuOpen, setIsMenuOpen] = useState(false);
 	const [scrollY, setScrollY] = useState(0);
 	const [isHeroVisible, setIsHeroVisible] = useState(false);
 	const [isCollectionsVisible, setIsCollectionsVisible] = useState(false);
@@ -121,109 +119,7 @@ function HomePage() {
 	return (
 		<div className="min-h-screen bg-black text-white overflow-x-hidden">
 			{/* Navigation */}
-			<nav
-				className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrollY > 50 ? "bg-black/90 backdrop-blur-lg border-b border-white/10" : "bg-transparent"}`}
-			>
-				<div className="max-w-7xl mx-auto px-6 py-6">
-					<div className="flex items-center justify-between">
-						<Link to="/" className="text-2xl font-black tracking-tighter">
-							ÆTHER
-						</Link>
-
-						<div className="hidden md:flex items-center space-x-12">
-							<Link
-								to="/categories"
-								className="text-sm font-medium tracking-wide hover:text-gray-300 transition-colors"
-							>
-								COLLECTIONS
-							</Link>
-							<Link
-								to="/categories"
-								className="text-sm font-medium tracking-wide hover:text-gray-300 transition-colors"
-							>
-								NEW ARRIVALS
-							</Link>
-							<Link
-								to="/categories"
-								className="text-sm font-medium tracking-wide hover:text-gray-300 transition-colors"
-							>
-								CLOTHING
-							</Link>
-							<Link
-								to="/categories"
-								className="text-sm font-medium tracking-wide hover:text-gray-300 transition-colors"
-							>
-								FOOTWEAR
-							</Link>
-							<Link
-								to="/categories"
-								className="text-sm font-medium tracking-wide hover:text-gray-300 transition-colors"
-							>
-								ACCESSORIES
-							</Link>
-							<Link
-								to="/editorial"
-								className="text-sm font-medium tracking-wide hover:text-gray-300 transition-colors"
-							>
-								EDITORIAL
-							</Link>
-						</div>
-
-						<div className="flex items-center space-x-4">
-							<button className="p-2 hover:bg-white/10 rounded-full transition-colors">
-								<Search className="w-5 h-5" />
-							</button>
-							<Link
-								to="/cart"
-								className="relative p-2 hover:bg-white/10 rounded-full transition-colors"
-							>
-								<ShoppingBag className="w-5 h-5" />
-								{itemCount > 0 && (
-									<span className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 bg-white text-black text-xs font-black rounded-sm">
-										{itemCount}
-									</span>
-								)}
-							</Link>
-							<button
-								className="md:hidden p-2 hover:bg-white/10 rounded-full transition-colors"
-								onClick={() => setIsMenuOpen(!isMenuOpen)}
-							>
-								{isMenuOpen ? (
-									<X className="w-5 h-5" />
-								) : (
-									<Menu className="w-5 h-5" />
-								)}
-							</button>
-						</div>
-					</div>
-				</div>
-
-				{/* Mobile Menu */}
-				{isMenuOpen && (
-					<div className="md:hidden bg-black border-t border-white/10">
-						<div className="px-6 py-6 space-y-4">
-							<Link to="/categories" className="block text-lg font-medium">
-								COLLECTIONS
-							</Link>
-							<Link to="/categories" className="block text-lg font-medium">
-								NEW ARRIVALS
-							</Link>
-							<Link to="/categories" className="block text-lg font-medium">
-								CLOTHING
-							</Link>
-							<Link to="/categories" className="block text-lg font-medium">
-								FOOTWEAR
-							</Link>
-							<Link to="/categories" className="block text-lg font-medium">
-								ACCESSORIES
-							</Link>
-							<Link to="/editorial" className="block text-lg font-medium">
-								EDITORIAL
-							</Link>
-						</div>
-					</div>
-				)}
-			</nav>
+			<HomeHeader scrollY={scrollY} />
 
 			{/* Hero Section */}
 			<section

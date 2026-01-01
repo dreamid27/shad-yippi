@@ -3,23 +3,27 @@
  * Page for managing user's shipping addresses
  */
 
-import { useState } from 'react'
-import { Link } from '@tanstack/react-router'
-import { Plus, MapPin, ArrowLeft } from 'lucide-react'
-import { AddressCard } from './address-card'
-import { AddressForm } from './address-form'
-import type { Address, CreateAddressRequest, UpdateAddressRequest } from '../types'
+import { useState } from "react";
+import { Link } from "@tanstack/react-router";
+import { Plus, MapPin, ArrowLeft } from "lucide-react";
+import { AddressCard } from "./address-card";
+import { AddressForm } from "./address-form";
+import type {
+	Address,
+	CreateAddressRequest,
+	UpdateAddressRequest,
+} from "../types";
 
 interface AddressManagementPageProps {
-	addresses: Address[]
-	loading?: boolean
-	onCreateAddress: (data: CreateAddressRequest) => Promise<void>
-	onUpdateAddress: (id: string, data: UpdateAddressRequest) => Promise<void>
-	onDeleteAddress: (id: string) => Promise<void>
-	onSetDefaultAddress: (id: string) => Promise<void>
+	addresses: Address[];
+	loading?: boolean;
+	onCreateAddress: (data: CreateAddressRequest) => Promise<void>;
+	onUpdateAddress: (id: string, data: UpdateAddressRequest) => Promise<void>;
+	onDeleteAddress: (id: string) => Promise<void>;
+	onSetDefaultAddress: (id: string) => Promise<void>;
 }
 
-type ViewMode = 'list' | 'create' | 'edit'
+type ViewMode = "list" | "create" | "edit";
 
 export function AddressManagementPage({
 	addresses,
@@ -29,75 +33,75 @@ export function AddressManagementPage({
 	onDeleteAddress,
 	onSetDefaultAddress,
 }: AddressManagementPageProps) {
-	const [viewMode, setViewMode] = useState<ViewMode>('list')
-	const [editingAddress, setEditingAddress] = useState<Address | undefined>(undefined)
-	const [submitting, setSubmitting] = useState(false)
+	const [viewMode, setViewMode] = useState<ViewMode>("list");
+	const [editingAddress, setEditingAddress] = useState<Address | undefined>(
+		undefined,
+	);
+	const [submitting, setSubmitting] = useState(false);
 
 	const handleCreateAddress = async (data: CreateAddressRequest) => {
-		setSubmitting(true)
+		setSubmitting(true);
 		try {
-			await onCreateAddress(data)
-			setViewMode('list')
+			await onCreateAddress(data);
+			setViewMode("list");
 		} finally {
-			setSubmitting(false)
+			setSubmitting(false);
 		}
-	}
+	};
 
 	const handleUpdateAddress = async (data: UpdateAddressRequest) => {
-		if (!editingAddress) return
-		setSubmitting(true)
+		if (!editingAddress) return;
+		setSubmitting(true);
 		try {
-			await onUpdateAddress(editingAddress.id, data)
-			setViewMode('list')
-			setEditingAddress(undefined)
+			await onUpdateAddress(editingAddress.id, data);
+			setViewMode("list");
+			setEditingAddress(undefined);
 		} finally {
-			setSubmitting(false)
+			setSubmitting(false);
 		}
-	}
+	};
 
 	const handleEditAddress = (addressId: string) => {
-		const address = addresses.find((a) => a.id === addressId)
+		const address = addresses.find((a) => a.id === addressId);
 		if (address) {
-			setEditingAddress(address)
-			setViewMode('edit')
+			setEditingAddress(address);
+			setViewMode("edit");
 		}
-	}
+	};
 
 	const handleDeleteAddress = async (addressId: string) => {
-		if (!confirm('Are you sure you want to delete this address?')) return
-		setSubmitting(true)
+		if (!confirm("Are you sure you want to delete this address?")) return;
+		setSubmitting(true);
 		try {
-			await onDeleteAddress(addressId)
+			await onDeleteAddress(addressId);
 		} finally {
-			setSubmitting(false)
+			setSubmitting(false);
 		}
-	}
+	};
 
 	const handleSetDefault = async (addressId: string) => {
-		setSubmitting(true)
+		setSubmitting(true);
 		try {
-			await onSetDefaultAddress(addressId)
+			await onSetDefaultAddress(addressId);
 		} finally {
-			setSubmitting(false)
+			setSubmitting(false);
 		}
-	}
+	};
 
 	const handleCancel = () => {
-		setViewMode('list')
-		setEditingAddress(undefined)
-	}
+		setViewMode("list");
+		setEditingAddress(undefined);
+	};
 
 	// List View
-	if (viewMode === 'list') {
+	if (viewMode === "list") {
 		return (
 			<div className="space-y-6">
 				{/* Header */}
 				<div className="flex items-center justify-between">
 					<div>
 						<h1 className="text-3xl font-black text-gray-900">My Addresses</h1>
-						<p className="text-gray-600 mt-1">
-							Manage your shipping addresses
-						</p>
+						<p className="text-gray-600 mt-1">Manage your shipping addresses</p>
 					</div>
 					<Link
 						to="/checkout"
@@ -146,7 +150,7 @@ export function AddressManagementPage({
 
 				{/* Add New Address Button */}
 				<button
-					onClick={() => setViewMode('create')}
+					onClick={() => setViewMode("create")}
 					disabled={submitting}
 					className="flex items-center justify-center gap-2 w-full py-4 bg-violet-600 hover:bg-violet-700 text-white font-bold rounded-xl transition-all duration-200 group disabled:opacity-50 disabled:cursor-not-allowed"
 					type="button"
@@ -158,7 +162,7 @@ export function AddressManagementPage({
 					Add New Address
 				</button>
 			</div>
-		)
+		);
 	}
 
 	// Create/Edit View
@@ -176,12 +180,12 @@ export function AddressManagementPage({
 				</button>
 				<div>
 					<h1 className="text-3xl font-black text-gray-900">
-						{viewMode === 'create' ? 'Add New Address' : 'Edit Address'}
+						{viewMode === "create" ? "Add New Address" : "Edit Address"}
 					</h1>
 					<p className="text-gray-600 mt-1">
-						{viewMode === 'create'
-							? 'Fill in the details below'
-							: 'Update your address information'}
+						{viewMode === "create"
+							? "Fill in the details below"
+							: "Update your address information"}
 					</p>
 				</div>
 			</div>
@@ -191,13 +195,15 @@ export function AddressManagementPage({
 				<AddressForm
 					address={editingAddress}
 					onSubmit={
-						viewMode === 'create' ? handleCreateAddress : handleUpdateAddress
+						viewMode === "create" ? handleCreateAddress : handleUpdateAddress
 					}
 					onCancel={handleCancel}
 					loading={submitting}
-					submitButtonText={viewMode === 'create' ? 'Add Address' : 'Update Address'}
+					submitButtonText={
+						viewMode === "create" ? "Add Address" : "Update Address"
+					}
 				/>
 			</div>
 		</div>
-	)
+	);
 }

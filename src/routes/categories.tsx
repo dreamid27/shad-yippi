@@ -1,16 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import {
-	ArrowLeft,
-	Search,
-	X,
-	ShoppingBag,
-	ChevronDown,
-	SlidersHorizontal,
-} from "lucide-react";
+import { X, ChevronDown, SlidersHorizontal } from "lucide-react";
 import { useState, useMemo, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useCart } from "@/hooks/use-cart";
+import { PageHeader } from "@/components/layout/header";
 import {
 	useProducts,
 	ProductSkeleton,
@@ -214,7 +208,7 @@ function FilterDrawer({
 }
 
 function CategoriesPage() {
-	const { itemCount, addItem } = useCart();
+	const { addItem } = useCart();
 
 	// Filter state
 	const [category, setCategory] = useState<string | null>(null);
@@ -228,11 +222,9 @@ function CategoriesPage() {
 	const [page, setPage] = useState(1);
 
 	// UI state
-	const [isSearchActive, setIsSearchActive] = useState(false);
 	const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
 	const [isSortOpen, setIsSortOpen] = useState(false);
 
-	const searchInputRef = useRef<HTMLInputElement>(null);
 	const categoryScrollRef = useRef<HTMLDivElement>(null);
 
 	// Debounce search
@@ -279,13 +271,6 @@ function CategoriesPage() {
 
 	// Fetch products from API
 	const { data, isLoading, isError } = useProducts(apiFilters);
-
-	// Focus search input when activated
-	useEffect(() => {
-		if (isSearchActive && searchInputRef.current) {
-			searchInputRef.current.focus();
-		}
-	}, [isSearchActive]);
 
 	// Prevent body scroll when drawer is open
 	useEffect(() => {
@@ -394,98 +379,12 @@ function CategoriesPage() {
 	return (
 		<div className="min-h-screen bg-black text-white">
 			{/* Header */}
-			<header className="sticky top-0 z-40 bg-black/95 backdrop-blur-md border-b border-white/10">
-				<div className="max-w-7xl mx-auto px-4 md:px-6">
-					<div className="flex items-center justify-between h-16">
-						{/* Mobile: Search Active State */}
-						{isSearchActive ? (
-							<div className="flex items-center gap-3 w-full md:hidden">
-								<button
-									onClick={() => {
-										setIsSearchActive(false);
-										setSearchInput("");
-									}}
-									className="p-2 -ml-2 hover:bg-white/10 transition-colors"
-									aria-label="Close search"
-								>
-									<ArrowLeft className="w-5 h-5" />
-								</button>
-								<Input
-									ref={searchInputRef}
-									type="search"
-									placeholder="SEARCH..."
-									value={searchInput}
-									onChange={(e) => setSearchInput(e.target.value)}
-									className="flex-1 bg-transparent border-white/20 text-white placeholder:text-gray-500 rounded-none h-10"
-								/>
-								<button
-									onClick={() => setSearchInput("")}
-									className="p-2 hover:bg-white/10 transition-colors"
-									aria-label="Clear search"
-								>
-									<X className="w-5 h-5" />
-								</button>
-							</div>
-						) : (
-							<>
-								{/* Left side */}
-								<div className="flex items-center gap-4 md:gap-6">
-									<Link
-										to="/"
-										className="flex items-center gap-2 hover:text-gray-300 transition-colors"
-									>
-										<ArrowLeft className="w-5 h-5" />
-										<span className="hidden md:inline text-sm font-medium tracking-wide">
-											BACK
-										</span>
-									</Link>
-									<div className="hidden md:block h-5 w-px bg-white/20" />
-									<h1 className="text-lg md:text-xl font-black tracking-tighter">
-										COLLECTIONS
-									</h1>
-								</div>
-
-								{/* Right side */}
-								<div className="flex items-center gap-2 md:gap-4">
-									{/* Desktop Search */}
-									<div className="hidden md:block">
-										<Input
-											type="search"
-											placeholder="SEARCH..."
-											value={searchInput}
-											onChange={(e) => setSearchInput(e.target.value)}
-											className="w-64 bg-transparent border-white/20 text-white placeholder:text-gray-500 rounded-none h-10"
-										/>
-									</div>
-
-									{/* Mobile Search Toggle */}
-									<button
-										onClick={() => setIsSearchActive(true)}
-										className="md:hidden p-2 hover:bg-white/10 transition-colors"
-										aria-label="Open search"
-									>
-										<Search className="w-5 h-5" />
-									</button>
-
-									{/* Cart */}
-									<Link
-										to="/cart"
-										className="relative p-2 hover:bg-white/10 transition-colors"
-										aria-label="Shopping cart"
-									>
-										<ShoppingBag className="w-5 h-5" />
-										{itemCount > 0 && (
-											<span className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 bg-white text-black text-xs font-black rounded-sm">
-												{itemCount}
-											</span>
-										)}
-									</Link>
-								</div>
-							</>
-						)}
-					</div>
-				</div>
-			</header>
+			<PageHeader
+				title="COLLECTIONS"
+				searchValue={searchInput}
+				onSearchChange={setSearchInput}
+				onSearchClear={() => setSearchInput("")}
+			/>
 
 			{/* Category Tabs */}
 			<div className="sticky top-16 z-30 bg-gray-950 border-b border-white/10">

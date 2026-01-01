@@ -8,7 +8,7 @@ import {
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 
-import Header from "../components/Header";
+import { useCartSync } from "@/features/cart";
 
 import appCss from "../styles.css?url";
 
@@ -83,6 +83,9 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 }
 
 function RootComponent() {
+	// Auto-sync cart on auth changes (guest cart ↔ backend)
+	useCartSync();
+
 	return (
 		<QueryClientProvider client={queryClient}>
 			<div className="min-h-screen bg-background font-sans antialiased">

@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://localhost:8089";
+import { API_BASE_URL } from "@/services/api/config";
 
 export const cartEndpoints = {
 	get: `${API_BASE_URL}/api/cart`,

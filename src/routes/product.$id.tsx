@@ -68,7 +68,7 @@ function ProductDetailPage() {
 			name: product!.name,
 			price: selectedVariant.final_price,
 			image: product!.image_urls[0],
-			category: product!.category.name,
+			category: product!.category?.name || "Uncategorized",
 		};
 
 		for (let i = 0; i < quantity; i++) {
@@ -246,10 +246,16 @@ function ProductDetailPage() {
 									<h2 className="text-4xl lg:text-5xl font-black tracking-tighter">
 										{product.name}
 									</h2>
-									<p className="text-lg text-gray-400">{product.brand.name}</p>
+									{product.brand && (
+										<p className="text-lg text-gray-400">
+											{product.brand.name}
+										</p>
+									)}
 								</div>
 								<div className="text-right">
-									{product.min_price !== product.max_price ? (
+									{product.min_price !== undefined &&
+									product.max_price !== undefined &&
+									product.min_price !== product.max_price ? (
 										<p className="text-3xl font-bold">
 											${product.min_price} - ${product.max_price}
 										</p>
@@ -264,7 +270,7 @@ function ProductDetailPage() {
 							</p>
 
 							{/* Stock indicator for product-level */}
-							{!selectedVariant && (
+							{!selectedVariant && product.has_stock !== undefined && (
 								<div className="pt-2">
 									<StockIndicator
 										stockQuantity={product.has_stock ? 1 : 0}
@@ -377,14 +383,18 @@ function ProductDetailPage() {
 
 							{/* Product Metadata */}
 							<div className="space-y-2 text-sm text-gray-400">
-								<p>
-									<span className="font-medium text-white">Category:</span>{" "}
-									{product.category.name}
-								</p>
-								<p>
-									<span className="font-medium text-white">Brand:</span>{" "}
-									{product.brand.name}
-								</p>
+								{product.category && (
+									<p>
+										<span className="font-medium text-white">Category:</span>{" "}
+										{product.category.name}
+									</p>
+								)}
+								{product.brand && (
+									<p>
+										<span className="font-medium text-white">Brand:</span>{" "}
+										{product.brand.name}
+									</p>
+								)}
 								{selectedVariant && (
 									<p>
 										<span className="font-medium text-white">SKU:</span>{" "}

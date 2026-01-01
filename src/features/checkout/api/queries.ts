@@ -3,8 +3,8 @@
  * TanStack Query hooks for checkout feature
  */
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { CHECKOUT_ENDPOINTS } from './endpoints'
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { CHECKOUT_ENDPOINTS } from "./endpoints";
 import type {
 	Address,
 	CreateAddressRequest,
@@ -15,7 +15,7 @@ import type {
 	VoucherValidationResponse,
 	Order,
 	CreateOrderRequest,
-} from '../types'
+} from "../types";
 
 // ============================================================================
 // ADDRESS QUERIES
@@ -23,121 +23,121 @@ import type {
 
 export function useAddresses() {
 	return useQuery({
-		queryKey: ['addresses'],
+		queryKey: ["addresses"],
 		queryFn: async (): Promise<Address[]> => {
-			const response = await fetch(CHECKOUT_ENDPOINTS.ADDRESSES)
+			const response = await fetch(CHECKOUT_ENDPOINTS.ADDRESSES);
 			if (!response.ok) {
-				throw new Error('Failed to fetch addresses')
+				throw new Error("Failed to fetch addresses");
 			}
-			const data = await response.json()
-			return data.data
+			const data = await response.json();
+			return data.data;
 		},
 		staleTime: 5 * 60 * 1000, // 5 minutes
-	})
+	});
 }
 
 export function useAddress(id: string) {
 	return useQuery({
-		queryKey: ['addresses', id],
+		queryKey: ["addresses", id],
 		queryFn: async (): Promise<Address> => {
-			const response = await fetch(CHECKOUT_ENDPOINTS.ADDRESS_BY_ID(id))
+			const response = await fetch(CHECKOUT_ENDPOINTS.ADDRESS_BY_ID(id));
 			if (!response.ok) {
-				throw new Error('Failed to fetch address')
+				throw new Error("Failed to fetch address");
 			}
-			const data = await response.json()
-			return data.data
+			const data = await response.json();
+			return data.data;
 		},
 		enabled: !!id,
 		staleTime: 5 * 60 * 1000,
-	})
+	});
 }
 
 export function useCreateAddress() {
-	const queryClient = useQueryClient()
+	const queryClient = useQueryClient();
 
 	return useMutation({
 		mutationFn: async (data: CreateAddressRequest): Promise<Address> => {
 			const response = await fetch(CHECKOUT_ENDPOINTS.ADDRESSES, {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify(data),
-			})
+			});
 			if (!response.ok) {
-				throw new Error('Failed to create address')
+				throw new Error("Failed to create address");
 			}
-			const result = await response.json()
-			return result.data
+			const result = await response.json();
+			return result.data;
 		},
 		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ['addresses'] })
+			queryClient.invalidateQueries({ queryKey: ["addresses"] });
 		},
-	})
+	});
 }
 
 export function useUpdateAddress() {
-	const queryClient = useQueryClient()
+	const queryClient = useQueryClient();
 
 	return useMutation({
 		mutationFn: async ({
 			id,
 			data,
 		}: {
-			id: string
-			data: UpdateAddressRequest
+			id: string;
+			data: UpdateAddressRequest;
 		}): Promise<Address> => {
 			const response = await fetch(CHECKOUT_ENDPOINTS.ADDRESS_BY_ID(id), {
-				method: 'PATCH',
-				headers: { 'Content-Type': 'application/json' },
+				method: "PATCH",
+				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify(data),
-			})
+			});
 			if (!response.ok) {
-				throw new Error('Failed to update address')
+				throw new Error("Failed to update address");
 			}
-			const result = await response.json()
-			return result.data
+			const result = await response.json();
+			return result.data;
 		},
 		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ['addresses'] })
+			queryClient.invalidateQueries({ queryKey: ["addresses"] });
 		},
-	})
+	});
 }
 
 export function useDeleteAddress() {
-	const queryClient = useQueryClient()
+	const queryClient = useQueryClient();
 
 	return useMutation({
 		mutationFn: async (id: string): Promise<void> => {
 			const response = await fetch(CHECKOUT_ENDPOINTS.ADDRESS_BY_ID(id), {
-				method: 'DELETE',
-			})
+				method: "DELETE",
+			});
 			if (!response.ok) {
-				throw new Error('Failed to delete address')
+				throw new Error("Failed to delete address");
 			}
 		},
 		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ['addresses'] })
+			queryClient.invalidateQueries({ queryKey: ["addresses"] });
 		},
-	})
+	});
 }
 
 export function useSetDefaultAddress() {
-	const queryClient = useQueryClient()
+	const queryClient = useQueryClient();
 
 	return useMutation({
 		mutationFn: async (id: string): Promise<Address> => {
 			const response = await fetch(CHECKOUT_ENDPOINTS.ADDRESS_DEFAULT(id), {
-				method: 'PATCH',
-			})
+				method: "PATCH",
+			});
 			if (!response.ok) {
-				throw new Error('Failed to set default address')
+				throw new Error("Failed to set default address");
 			}
-			const result = await response.json()
-			return result.data
+			const result = await response.json();
+			return result.data;
 		},
 		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ['addresses'] })
+			queryClient.invalidateQueries({ queryKey: ["addresses"] });
 		},
-	})
+	});
 }
 
 // ============================================================================
@@ -146,26 +146,26 @@ export function useSetDefaultAddress() {
 
 export function useShippingCosts(request: ShippingCostRequest) {
 	return useQuery({
-		queryKey: ['shipping-costs', request],
+		queryKey: ["shipping-costs", request],
 		queryFn: async (): Promise<ShippingCostResult[]> => {
 			const params = new URLSearchParams({
 				origin_city_id: request.origin_city_id,
 				destination_city_id: request.destination_city_id,
 				weight: request.weight.toString(),
 				...(request.courier && { courier: request.courier }),
-			})
+			});
 			const response = await fetch(
 				`${CHECKOUT_ENDPOINTS.SHIPPING_COST}?${params}`,
-			)
+			);
 			if (!response.ok) {
-				throw new Error('Failed to fetch shipping costs')
+				throw new Error("Failed to fetch shipping costs");
 			}
-			const data = await response.json()
-			return data.data
+			const data = await response.json();
+			return data.data;
 		},
 		enabled: !!request.destination_city_id,
 		staleTime: 10 * 60 * 1000, // 10 minutes
-	})
+	});
 }
 
 // ============================================================================
@@ -174,35 +174,35 @@ export function useShippingCosts(request: ShippingCostRequest) {
 
 export function useProvinces() {
 	return useQuery({
-		queryKey: ['provinces'],
+		queryKey: ["provinces"],
 		queryFn: async () => {
-			const response = await fetch(CHECKOUT_ENDPOINTS.PROVINCES)
+			const response = await fetch(CHECKOUT_ENDPOINTS.PROVINCES);
 			if (!response.ok) {
-				throw new Error('Failed to fetch provinces')
+				throw new Error("Failed to fetch provinces");
 			}
-			const data = await response.json()
-			return data.data
+			const data = await response.json();
+			return data.data;
 		},
 		staleTime: 60 * 60 * 1000, // 1 hour
-	})
+	});
 }
 
 export function useCities(provinceId: string) {
 	return useQuery({
-		queryKey: ['cities', provinceId],
+		queryKey: ["cities", provinceId],
 		queryFn: async () => {
 			const response = await fetch(
 				CHECKOUT_ENDPOINTS.CITIES_BY_PROVINCE(provinceId),
-			)
+			);
 			if (!response.ok) {
-				throw new Error('Failed to fetch cities')
+				throw new Error("Failed to fetch cities");
 			}
-			const data = await response.json()
-			return data.data
+			const data = await response.json();
+			return data.data;
 		},
 		enabled: !!provinceId,
 		staleTime: 60 * 60 * 1000, // 1 hour
-	})
+	});
 }
 
 // ============================================================================
@@ -215,17 +215,17 @@ export function useValidateVoucher() {
 			request: VoucherValidationRequest,
 		): Promise<VoucherValidationResponse> => {
 			const response = await fetch(CHECKOUT_ENDPOINTS.VOUCHER_VALIDATE, {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify(request),
-			})
+			});
 			if (!response.ok) {
-				throw new Error('Failed to validate voucher')
+				throw new Error("Failed to validate voucher");
 			}
-			const data = await response.json()
-			return data.data
+			const data = await response.json();
+			return data.data;
 		},
-	})
+	});
 }
 
 // ============================================================================
@@ -233,25 +233,25 @@ export function useValidateVoucher() {
 // ============================================================================
 
 export function useCreateOrder() {
-	const queryClient = useQueryClient()
+	const queryClient = useQueryClient();
 
 	return useMutation({
 		mutationFn: async (data: CreateOrderRequest): Promise<Order> => {
 			const response = await fetch(CHECKOUT_ENDPOINTS.ORDERS, {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify(data),
-			})
+			});
 			if (!response.ok) {
-				throw new Error('Failed to create order')
+				throw new Error("Failed to create order");
 			}
-			const result = await response.json()
-			return result.data
+			const result = await response.json();
+			return result.data;
 		},
 		onSuccess: () => {
 			// Invalidate cart and orders queries
-			queryClient.invalidateQueries({ queryKey: ['cart'] })
-			queryClient.invalidateQueries({ queryKey: ['orders'] })
+			queryClient.invalidateQueries({ queryKey: ["cart"] });
+			queryClient.invalidateQueries({ queryKey: ["orders"] });
 		},
-	})
+	});
 }

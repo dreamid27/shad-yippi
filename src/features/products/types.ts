@@ -13,18 +13,18 @@ export interface Product {
 		width: number;
 		height: number;
 	};
-	category: {
+	category?: {
 		id: string;
 		name: string;
 	};
-	brand: {
+	brand?: {
 		id: string;
 		name: string;
 	};
-	variants_count: number;
-	min_price: number;
-	max_price: number;
-	has_stock: boolean;
+	variants_count?: number;
+	min_price?: number;
+	max_price?: number;
+	has_stock?: boolean;
 	created_at: string;
 	updated_at: string;
 }
