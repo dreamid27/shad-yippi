@@ -388,12 +388,12 @@ Domain:      Custom domain + SSL
 ### **PHASE 2: Product Catalog & Cart (Week 3-4)**
 
 **Backend Tasks:**
-- [ ] Create ProductVariant entity & schema (size, color, stock)
-- [ ] Enhance Product with stock_quantity field
-- [ ] Product search & filter endpoints (category, brand, price, sort)
-- [ ] Create Cart entity & schema
-- [ ] Create CartItem entity & schema
-- [ ] Cart service: Add, Update, Remove, Clear, GetCart
+- [x] Create ProductVariant entity & schema (size, color, stock)
+- [x] Enhance Product with stock_quantity field
+- [x] Product search & filter endpoints (category, brand, price, sort)
+- [x] Create Cart entity & schema
+- [x] Create CartItem entity & schema
+- [x] Cart service: Add, Update, Remove, Clear, GetCart
 - [ ] Cart handlers & routes
 - [ ] Stock validation logic
 

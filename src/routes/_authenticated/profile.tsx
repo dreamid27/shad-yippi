@@ -1,21 +1,21 @@
-import { createFileRoute } from "@tanstack/react-router"
-import { useAuth, useLogout } from "@/features/auth"
-import { Button } from "@/components/ui/button"
+import { createFileRoute } from "@tanstack/react-router";
+import { useAuth, useLogout } from "@/features/auth";
+import { Button } from "@/components/ui/button";
 import {
 	Card,
 	CardContent,
 	CardDescription,
 	CardHeader,
 	CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
 
 export const Route = createFileRoute("/_authenticated/profile")({
 	component: ProfilePage,
-})
+});
 
 function ProfilePage() {
-	const { user } = useAuth()
-	const logout = useLogout()
+	const { user } = useAuth();
+	const logout = useLogout();
 
 	return (
 		<div className="container mx-auto p-8">
@@ -53,5 +53,5 @@ function ProfilePage() {
 				</CardContent>
 			</Card>
 		</div>
-	)
+	);
 }

@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router"
+import { createFileRoute, Link } from "@tanstack/react-router";
 import {
 	Search,
 	ShoppingBag,
@@ -8,59 +8,57 @@ import {
 	Truck,
 	Shield,
 	RefreshCw,
-} from "lucide-react"
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { useCart, type Product } from "@/hooks/use-cart"
+} from "lucide-react";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { useCart, type Product } from "@/hooks/use-cart";
 import {
 	useProductDetail,
 	VariantSelector,
 	StockIndicator,
 	type ProductVariant,
-} from "@/features/products"
+} from "@/features/products";
 
 export const Route = createFileRoute("/product/$id")({
 	component: ProductDetailPage,
-})
+});
 
 function ProductDetailPage() {
-	const { addItem, itemCount } = useCart()
-	const { id } = Route.useParams()
-	const [selectedImage, setSelectedImage] = useState(0)
+	const { addItem, itemCount } = useCart();
+	const { id } = Route.useParams();
+	const [selectedImage, setSelectedImage] = useState(0);
 	const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(
 		null,
-	)
-	const [quantity, setQuantity] = useState(1)
-	const [isZoomed, setIsZoomed] = useState(false)
-	const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 })
-	const [addedToCart, setAddedToCart] = useState(false)
+	);
+	const [quantity, setQuantity] = useState(1);
+	const [isZoomed, setIsZoomed] = useState(false);
+	const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 });
+	const [addedToCart, setAddedToCart] = useState(false);
 
 	// Fetch product detail from API
-	const { data: product, isLoading, isError } = useProductDetail(id)
+	const { data: product, isLoading, isError } = useProductDetail(id);
 
 	const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-		const rect = e.currentTarget.getBoundingClientRect()
-		const x = ((e.clientX - rect.left) / rect.width) * 100
-		const y = ((e.clientY - rect.top) / rect.height) * 100
-		setZoomPosition({ x, y })
-	}
+		const rect = e.currentTarget.getBoundingClientRect();
+		const x = ((e.clientX - rect.left) / rect.width) * 100;
+		const y = ((e.clientY - rect.top) / rect.height) * 100;
+		setZoomPosition({ x, y });
+	};
 
 	const handleAddToCart = () => {
 		if (!selectedVariant) {
-			alert("Please select all product options")
-			return
+			alert("Please select all product options");
+			return;
 		}
 
 		if (!selectedVariant.is_in_stock || selectedVariant.stock_quantity === 0) {
-			alert("This variant is currently out of stock")
-			return
+			alert("This variant is currently out of stock");
+			return;
 		}
 
 		if (quantity > selectedVariant.stock_quantity) {
-			alert(
-				`Only ${selectedVariant.stock_quantity} items available in stock`,
-			)
-			return
+			alert(`Only ${selectedVariant.stock_quantity} items available in stock`);
+			return;
 		}
 
 		// TODO: Replace with real cart integration
@@ -71,23 +69,23 @@ function ProductDetailPage() {
 			price: selectedVariant.final_price,
 			image: product!.image_urls[0],
 			category: product!.category.name,
-		}
+		};
 
 		for (let i = 0; i < quantity; i++) {
-			addItem(cartProduct)
+			addItem(cartProduct);
 		}
 
-		setAddedToCart(true)
-		setTimeout(() => setAddedToCart(false), 2000)
-	}
+		setAddedToCart(true);
+		setTimeout(() => setAddedToCart(false), 2000);
+	};
 
 	const handleVariantChange = (variant: ProductVariant | null) => {
-		setSelectedVariant(variant)
+		setSelectedVariant(variant);
 		// Reset quantity when variant changes
 		if (variant) {
-			setQuantity(1)
+			setQuantity(1);
 		}
-	}
+	};
 
 	// Loading state
 	if (isLoading) {
@@ -113,7 +111,7 @@ function ProductDetailPage() {
 					</div>
 				</div>
 			</div>
-		)
+		);
 	}
 
 	// Error state
@@ -144,7 +142,7 @@ function ProductDetailPage() {
 					</Button>
 				</div>
 			</div>
-		)
+		);
 	}
 
 	return (
@@ -402,5 +400,5 @@ function ProductDetailPage() {
 			{/* Related Products Section - TODO: Implement with real API in future */}
 			{/* For now, removed to avoid mock data */}
 		</div>
-	)
+	);
 }

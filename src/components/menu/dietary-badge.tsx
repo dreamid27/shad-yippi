@@ -1,42 +1,57 @@
-import type { MenuItem } from '@/services/api'
+import type { MenuItem } from "@/services/api";
 
 interface DietaryBadgeProps {
-	item: MenuItem
+	item: MenuItem;
 }
 
 export function DietaryBadge({ item }: DietaryBadgeProps) {
-	const badges: Array<{ label: string; show: boolean; bgColor: string; textColor: string }> = [
-		{ label: 'POPULAR', show: item.badges.popular, bgColor: 'bg-black', textColor: 'text-white' },
+	const badges: Array<{
+		label: string;
+		show: boolean;
+		bgColor: string;
+		textColor: string;
+	}> = [
 		{
-			label: 'CHEF SPECIAL',
+			label: "POPULAR",
+			show: item.badges.popular,
+			bgColor: "bg-black",
+			textColor: "text-white",
+		},
+		{
+			label: "CHEF SPECIAL",
 			show: item.badges.chef_special,
-			bgColor: 'bg-gray-900',
-			textColor: 'text-white',
+			bgColor: "bg-gray-900",
+			textColor: "text-white",
 		},
 		{
-			label: 'CUSTOMER CHOICE',
+			label: "CUSTOMER CHOICE",
 			show: item.badges.customer_choice,
-			bgColor: 'bg-gray-800',
-			textColor: 'text-white',
+			bgColor: "bg-gray-800",
+			textColor: "text-white",
 		},
-		{ label: 'VEGAN', show: item.dietary.vegan, bgColor: 'bg-black', textColor: 'text-white' },
 		{
-			label: 'VEGETARIAN',
+			label: "VEGAN",
+			show: item.dietary.vegan,
+			bgColor: "bg-black",
+			textColor: "text-white",
+		},
+		{
+			label: "VEGETARIAN",
 			show: item.dietary.vegetarian,
-			bgColor: 'bg-gray-900',
-			textColor: 'text-white',
+			bgColor: "bg-gray-900",
+			textColor: "text-white",
 		},
 		{
-			label: 'GLUTEN FREE',
+			label: "GLUTEN FREE",
 			show: item.dietary.gluten_free,
-			bgColor: 'bg-gray-800',
-			textColor: 'text-white',
+			bgColor: "bg-gray-800",
+			textColor: "text-white",
 		},
-	]
+	];
 
-	const visibleBadges = badges.filter((b) => b.show)
+	const visibleBadges = badges.filter((b) => b.show);
 
-	if (visibleBadges.length === 0) return null
+	if (visibleBadges.length === 0) return null;
 
 	return (
 		<div className="flex flex-wrap gap-1.5 mt-3">
@@ -49,5 +64,5 @@ export function DietaryBadge({ item }: DietaryBadgeProps) {
 				</span>
 			))}
 		</div>
-	)
+	);
 }

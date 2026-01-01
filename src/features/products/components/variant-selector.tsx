@@ -1,18 +1,18 @@
-import { useMemo, useState } from "react"
-import type { ProductVariant, VariantOption } from "../types"
-import { Button } from "@/components/ui/button"
+import { useMemo, useState } from "react";
+import type { ProductVariant, VariantOption } from "../types";
+import { Button } from "@/components/ui/button";
 import {
 	Select,
 	SelectContent,
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
-} from "@/components/ui/select"
+} from "@/components/ui/select";
 
 interface VariantSelectorProps {
-	variants: ProductVariant[]
-	onVariantChange: (variant: ProductVariant | null) => void
-	selectedVariant?: ProductVariant | null
+	variants: ProductVariant[];
+	onVariantChange: (variant: ProductVariant | null) => void;
+	selectedVariant?: ProductVariant | null;
 }
 
 export function VariantSelector({
@@ -22,63 +22,63 @@ export function VariantSelector({
 }: VariantSelectorProps) {
 	// Extract all unique attribute keys from variants
 	const attributeKeys = useMemo(() => {
-		const keys = new Set<string>()
+		const keys = new Set<string>();
 		for (const variant of variants) {
 			for (const key of Object.keys(variant.attributes)) {
-				keys.add(key)
+				keys.add(key);
 			}
 		}
-		return Array.from(keys)
-	}, [variants])
+		return Array.from(keys);
+	}, [variants]);
 
 	// Track selected values for each attribute
 	const [selectedAttributes, setSelectedAttributes] = useState<
 		Record<string, string>
 	>(() => {
 		if (selectedVariant) {
-			return selectedVariant.attributes
+			return selectedVariant.attributes;
 		}
-		return {}
-	})
+		return {};
+	});
 
 	// Get available options for a specific attribute based on current selections
 	const getAvailableOptions = (
 		attributeKey: string,
 	): Map<string, VariantOption> => {
-		const options = new Map<string, VariantOption>()
+		const options = new Map<string, VariantOption>();
 
 		// Filter variants based on other selected attributes (progressive filtering)
 		const relevantVariants = variants.filter((variant) => {
 			return Object.entries(selectedAttributes).every(([key, value]) => {
 				// Skip the current attribute we're checking
-				if (key === attributeKey) return true
-				return variant.attributes[key] === value
-			})
-		})
+				if (key === attributeKey) return true;
+				return variant.attributes[key] === value;
+			});
+		});
 
 		// Collect all unique values for this attribute
 		for (const variant of relevantVariants) {
-			const value = variant.attributes[attributeKey]
-			if (!value) continue
+			const value = variant.attributes[attributeKey];
+			if (!value) continue;
 
 			// Check if this option is available (in stock and active)
 			const isAvailable =
-				variant.is_active && variant.is_in_stock && variant.stock_quantity > 0
+				variant.is_active && variant.is_in_stock && variant.stock_quantity > 0;
 
 			// If we've seen this value before, mark as available if ANY variant is available
 			if (options.has(value)) {
-				const existing = options.get(value)!
+				const existing = options.get(value)!;
 				options.set(value, {
 					value,
 					isAvailable: existing.isAvailable || isAvailable,
-				})
+				});
 			} else {
-				options.set(value, { value, isAvailable })
+				options.set(value, { value, isAvailable });
 			}
 		}
 
-		return options
-	}
+		return options;
+	};
 
 	// Find matching variant based on selected attributes
 	const findMatchingVariant = (
@@ -88,42 +88,42 @@ export function VariantSelector({
 			variants.find((variant) => {
 				return Object.entries(attrs).every(
 					([key, value]) => variant.attributes[key] === value,
-				)
+				);
 			}) || null
-		)
-	}
+		);
+	};
 
 	// Handle attribute selection
 	const handleAttributeChange = (key: string, value: string) => {
-		const newAttributes = { ...selectedAttributes, [key]: value }
-		setSelectedAttributes(newAttributes)
+		const newAttributes = { ...selectedAttributes, [key]: value };
+		setSelectedAttributes(newAttributes);
 
 		// Check if all attributes are selected
-		const allSelected = attributeKeys.every((k) => newAttributes[k])
+		const allSelected = attributeKeys.every((k) => newAttributes[k]);
 
 		if (allSelected) {
-			const matchingVariant = findMatchingVariant(newAttributes)
-			onVariantChange(matchingVariant)
+			const matchingVariant = findMatchingVariant(newAttributes);
+			onVariantChange(matchingVariant);
 		} else {
-			onVariantChange(null)
+			onVariantChange(null);
 		}
-	}
+	};
 
 	// Determine UI type for attribute (size/color get special treatment)
 	const getUIType = (key: string): "size" | "color" | "generic" => {
-		const lowerKey = key.toLowerCase()
-		if (lowerKey === "size" || lowerKey === "ukuran") return "size"
-		if (lowerKey === "color" || lowerKey === "warna") return "color"
-		return "generic"
-	}
+		const lowerKey = key.toLowerCase();
+		if (lowerKey === "size" || lowerKey === "ukuran") return "size";
+		if (lowerKey === "color" || lowerKey === "warna") return "color";
+		return "generic";
+	};
 
 	// Render attribute selector based on type
 	const renderAttributeSelector = (attributeKey: string) => {
-		const uiType = getUIType(attributeKey)
-		const options = getAvailableOptions(attributeKey)
-		const selectedValue = selectedAttributes[attributeKey]
+		const uiType = getUIType(attributeKey);
+		const options = getAvailableOptions(attributeKey);
+		const selectedValue = selectedAttributes[attributeKey];
 
-		if (options.size === 0) return null
+		if (options.size === 0) return null;
 
 		// Size selector - button grid
 		if (uiType === "size") {
@@ -137,7 +137,9 @@ export function VariantSelector({
 							<Button
 								key={option.value}
 								variant={selectedValue === option.value ? "default" : "outline"}
-								onClick={() => handleAttributeChange(attributeKey, option.value)}
+								onClick={() =>
+									handleAttributeChange(attributeKey, option.value)
+								}
 								disabled={!option.isAvailable}
 								className={`
 									min-w-[60px] h-12 border transition-all
@@ -154,7 +156,7 @@ export function VariantSelector({
 						))}
 					</div>
 				</div>
-			)
+			);
 		}
 
 		// Color selector - color swatches with border
@@ -166,7 +168,7 @@ export function VariantSelector({
 					</label>
 					<div className="flex flex-wrap gap-3">
 						{Array.from(options.values()).map((option) => {
-							const colorValue = option.value.toLowerCase()
+							const colorValue = option.value.toLowerCase();
 							// Map common color names to hex/css colors
 							const colorMap: Record<string, string> = {
 								red: "#FF0000",
@@ -194,9 +196,9 @@ export function VariantSelector({
 								beige: "#F5F5DC",
 								cream: "#FFFDD0",
 								krem: "#FFFDD0",
-							}
+							};
 
-							const bgColor = colorMap[colorValue] || colorValue
+							const bgColor = colorMap[colorValue] || colorValue;
 
 							return (
 								<button
@@ -227,14 +229,14 @@ export function VariantSelector({
 										</div>
 									)}
 								</button>
-							)
+							);
 						})}
 					</div>
 					{selectedValue && (
 						<p className="text-sm text-gray-400">Selected: {selectedValue}</p>
 					)}
 				</div>
-			)
+			);
 		}
 
 		// Generic selector - dropdown
@@ -265,11 +267,11 @@ export function VariantSelector({
 					</SelectContent>
 				</Select>
 			</div>
-		)
-	}
+		);
+	};
 
 	if (attributeKeys.length === 0) {
-		return null
+		return null;
 	}
 
 	return (
@@ -289,5 +291,5 @@ export function VariantSelector({
 				</div>
 			)}
 		</div>
-	)
+	);
 }

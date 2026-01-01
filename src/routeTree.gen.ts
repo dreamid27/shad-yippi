@@ -10,14 +10,18 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as RegisterRouteImport } from './routes/register'
+import { Route as OrdersRouteImport } from './routes/orders'
 import { Route as LoginRouteImport } from './routes/login'
-import { Route as LandingRouteImport } from './routes/landing'
+import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as CategoriesRouteImport } from './routes/categories'
 import { Route as CartRouteImport } from './routes/cart'
+import { Route as AddressesRouteImport } from './routes/addresses'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProductIdRouteImport } from './routes/product.$id'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
+import { Route as OrdersSuccessIdRouteImport } from './routes/orders.success.$id'
+import { Route as OrdersFailedIdRouteImport } from './routes/orders.failed.$id'
 import { Route as DemoStartServerFuncsRouteImport } from './routes/demo/start.server-funcs'
 import { Route as DemoStartApiRequestRouteImport } from './routes/demo/start.api-request'
 import { Route as DemoApiNamesRouteImport } from './routes/demo/api.names'
@@ -31,14 +35,19 @@ const RegisterRoute = RegisterRouteImport.update({
   path: '/register',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OrdersRoute = OrdersRouteImport.update({
+  id: '/orders',
+  path: '/orders',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
-const LandingRoute = LandingRouteImport.update({
-  id: '/landing',
-  path: '/landing',
+const CheckoutRoute = CheckoutRouteImport.update({
+  id: '/checkout',
+  path: '/checkout',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CategoriesRoute = CategoriesRouteImport.update({
@@ -49,6 +58,11 @@ const CategoriesRoute = CategoriesRouteImport.update({
 const CartRoute = CartRouteImport.update({
   id: '/cart',
   path: '/cart',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AddressesRoute = AddressesRouteImport.update({
+  id: '/addresses',
+  path: '/addresses',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
@@ -69,6 +83,16 @@ const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
   getParentRoute: () => AuthenticatedRoute,
+} as any)
+const OrdersSuccessIdRoute = OrdersSuccessIdRouteImport.update({
+  id: '/success/$id',
+  path: '/success/$id',
+  getParentRoute: () => OrdersRoute,
+} as any)
+const OrdersFailedIdRoute = OrdersFailedIdRouteImport.update({
+  id: '/failed/$id',
+  path: '/failed/$id',
+  getParentRoute: () => OrdersRoute,
 } as any)
 const DemoStartServerFuncsRoute = DemoStartServerFuncsRouteImport.update({
   id: '/demo/start/server-funcs',
@@ -108,16 +132,20 @@ const DemoStartSsrDataOnlyRoute = DemoStartSsrDataOnlyRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/addresses': typeof AddressesRoute
   '/cart': typeof CartRoute
   '/categories': typeof CategoriesRoute
-  '/landing': typeof LandingRoute
+  '/checkout': typeof CheckoutRoute
   '/login': typeof LoginRoute
+  '/orders': typeof OrdersRouteWithChildren
   '/register': typeof RegisterRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/product/$id': typeof ProductIdRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
+  '/orders/failed/$id': typeof OrdersFailedIdRoute
+  '/orders/success/$id': typeof OrdersSuccessIdRoute
   '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
   '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
   '/demo/start/ssr/spa-mode': typeof DemoStartSsrSpaModeRoute
@@ -125,16 +153,20 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/addresses': typeof AddressesRoute
   '/cart': typeof CartRoute
   '/categories': typeof CategoriesRoute
-  '/landing': typeof LandingRoute
+  '/checkout': typeof CheckoutRoute
   '/login': typeof LoginRoute
+  '/orders': typeof OrdersRouteWithChildren
   '/register': typeof RegisterRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/product/$id': typeof ProductIdRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
+  '/orders/failed/$id': typeof OrdersFailedIdRoute
+  '/orders/success/$id': typeof OrdersSuccessIdRoute
   '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
   '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
   '/demo/start/ssr/spa-mode': typeof DemoStartSsrSpaModeRoute
@@ -144,16 +176,20 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/addresses': typeof AddressesRoute
   '/cart': typeof CartRoute
   '/categories': typeof CategoriesRoute
-  '/landing': typeof LandingRoute
+  '/checkout': typeof CheckoutRoute
   '/login': typeof LoginRoute
+  '/orders': typeof OrdersRouteWithChildren
   '/register': typeof RegisterRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/product/$id': typeof ProductIdRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
+  '/orders/failed/$id': typeof OrdersFailedIdRoute
+  '/orders/success/$id': typeof OrdersSuccessIdRoute
   '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
   '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
   '/demo/start/ssr/spa-mode': typeof DemoStartSsrSpaModeRoute
@@ -163,16 +199,20 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/addresses'
     | '/cart'
     | '/categories'
-    | '/landing'
+    | '/checkout'
     | '/login'
+    | '/orders'
     | '/register'
     | '/profile'
     | '/product/$id'
     | '/demo/api/names'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
+    | '/orders/failed/$id'
+    | '/orders/success/$id'
     | '/demo/start/ssr/data-only'
     | '/demo/start/ssr/full-ssr'
     | '/demo/start/ssr/spa-mode'
@@ -180,16 +220,20 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/addresses'
     | '/cart'
     | '/categories'
-    | '/landing'
+    | '/checkout'
     | '/login'
+    | '/orders'
     | '/register'
     | '/profile'
     | '/product/$id'
     | '/demo/api/names'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
+    | '/orders/failed/$id'
+    | '/orders/success/$id'
     | '/demo/start/ssr/data-only'
     | '/demo/start/ssr/full-ssr'
     | '/demo/start/ssr/spa-mode'
@@ -198,16 +242,20 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/addresses'
     | '/cart'
     | '/categories'
-    | '/landing'
+    | '/checkout'
     | '/login'
+    | '/orders'
     | '/register'
     | '/_authenticated/profile'
     | '/product/$id'
     | '/demo/api/names'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
+    | '/orders/failed/$id'
+    | '/orders/success/$id'
     | '/demo/start/ssr/data-only'
     | '/demo/start/ssr/full-ssr'
     | '/demo/start/ssr/spa-mode'
@@ -217,10 +265,12 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  AddressesRoute: typeof AddressesRoute
   CartRoute: typeof CartRoute
   CategoriesRoute: typeof CategoriesRoute
-  LandingRoute: typeof LandingRoute
+  CheckoutRoute: typeof CheckoutRoute
   LoginRoute: typeof LoginRoute
+  OrdersRoute: typeof OrdersRouteWithChildren
   RegisterRoute: typeof RegisterRoute
   ProductIdRoute: typeof ProductIdRoute
   DemoApiNamesRoute: typeof DemoApiNamesRoute
@@ -241,6 +291,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RegisterRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/orders': {
+      id: '/orders'
+      path: '/orders'
+      fullPath: '/orders'
+      preLoaderRoute: typeof OrdersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -248,11 +305,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/landing': {
-      id: '/landing'
-      path: '/landing'
-      fullPath: '/landing'
-      preLoaderRoute: typeof LandingRouteImport
+    '/checkout': {
+      id: '/checkout'
+      path: '/checkout'
+      fullPath: '/checkout'
+      preLoaderRoute: typeof CheckoutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/categories': {
@@ -267,6 +324,13 @@ declare module '@tanstack/react-router' {
       path: '/cart'
       fullPath: '/cart'
       preLoaderRoute: typeof CartRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/addresses': {
+      id: '/addresses'
+      path: '/addresses'
+      fullPath: '/addresses'
+      preLoaderRoute: typeof AddressesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -296,6 +360,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/profile'
       preLoaderRoute: typeof AuthenticatedProfileRouteImport
       parentRoute: typeof AuthenticatedRoute
+    }
+    '/orders/success/$id': {
+      id: '/orders/success/$id'
+      path: '/success/$id'
+      fullPath: '/orders/success/$id'
+      preLoaderRoute: typeof OrdersSuccessIdRouteImport
+      parentRoute: typeof OrdersRoute
+    }
+    '/orders/failed/$id': {
+      id: '/orders/failed/$id'
+      path: '/failed/$id'
+      fullPath: '/orders/failed/$id'
+      preLoaderRoute: typeof OrdersFailedIdRouteImport
+      parentRoute: typeof OrdersRoute
     }
     '/demo/start/server-funcs': {
       id: '/demo/start/server-funcs'
@@ -361,13 +439,28 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
   AuthenticatedRouteChildren,
 )
 
+interface OrdersRouteChildren {
+  OrdersFailedIdRoute: typeof OrdersFailedIdRoute
+  OrdersSuccessIdRoute: typeof OrdersSuccessIdRoute
+}
+
+const OrdersRouteChildren: OrdersRouteChildren = {
+  OrdersFailedIdRoute: OrdersFailedIdRoute,
+  OrdersSuccessIdRoute: OrdersSuccessIdRoute,
+}
+
+const OrdersRouteWithChildren =
+  OrdersRoute._addFileChildren(OrdersRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  AddressesRoute: AddressesRoute,
   CartRoute: CartRoute,
   CategoriesRoute: CategoriesRoute,
-  LandingRoute: LandingRoute,
+  CheckoutRoute: CheckoutRoute,
   LoginRoute: LoginRoute,
+  OrdersRoute: OrdersRouteWithChildren,
   RegisterRoute: RegisterRoute,
   ProductIdRoute: ProductIdRoute,
   DemoApiNamesRoute: DemoApiNamesRoute,

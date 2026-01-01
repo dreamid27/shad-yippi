@@ -1,18 +1,18 @@
-import { cartEndpoints } from "./endpoints"
-import type { Cart, CartMergeRequest } from "../types"
+import { cartEndpoints } from "./endpoints";
+import type { Cart, CartMergeRequest } from "../types";
 
 export async function fetchCart(accessToken: string): Promise<Cart> {
 	const response = await fetch(cartEndpoints.get, {
 		headers: {
 			Authorization: `Bearer ${accessToken}`,
 		},
-	})
+	});
 
 	if (!response.ok) {
-		throw new Error(`Failed to fetch cart: ${response.statusText}`)
+		throw new Error(`Failed to fetch cart: ${response.statusText}`);
 	}
 
-	return response.json()
+	return response.json();
 }
 
 export async function addCartItem(
@@ -30,13 +30,13 @@ export async function addCartItem(
 			product_variant_id: variantId,
 			quantity,
 		}),
-	})
+	});
 
 	if (!response.ok) {
-		throw new Error(`Failed to add item to cart: ${response.statusText}`)
+		throw new Error(`Failed to add item to cart: ${response.statusText}`);
 	}
 
-	return response.json()
+	return response.json();
 }
 
 export async function updateCartItem(
@@ -51,13 +51,13 @@ export async function updateCartItem(
 			Authorization: `Bearer ${accessToken}`,
 		},
 		body: JSON.stringify({ quantity }),
-	})
+	});
 
 	if (!response.ok) {
-		throw new Error(`Failed to update cart item: ${response.statusText}`)
+		throw new Error(`Failed to update cart item: ${response.statusText}`);
 	}
 
-	return response.json()
+	return response.json();
 }
 
 export async function removeCartItem(
@@ -69,10 +69,10 @@ export async function removeCartItem(
 		headers: {
 			Authorization: `Bearer ${accessToken}`,
 		},
-	})
+	});
 
 	if (!response.ok) {
-		throw new Error(`Failed to remove cart item: ${response.statusText}`)
+		throw new Error(`Failed to remove cart item: ${response.statusText}`);
 	}
 }
 
@@ -82,10 +82,10 @@ export async function clearCart(accessToken: string): Promise<void> {
 		headers: {
 			Authorization: `Bearer ${accessToken}`,
 		},
-	})
+	});
 
 	if (!response.ok) {
-		throw new Error(`Failed to clear cart: ${response.statusText}`)
+		throw new Error(`Failed to clear cart: ${response.statusText}`);
 	}
 }
 
@@ -100,11 +100,11 @@ export async function mergeCart(
 			Authorization: `Bearer ${accessToken}`,
 		},
 		body: JSON.stringify(items),
-	})
+	});
 
 	if (!response.ok) {
-		throw new Error(`Failed to merge cart: ${response.statusText}`)
+		throw new Error(`Failed to merge cart: ${response.statusText}`);
 	}
 
-	return response.json()
+	return response.json();
 }

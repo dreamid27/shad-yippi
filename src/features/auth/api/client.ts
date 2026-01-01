@@ -4,8 +4,8 @@ import type {
 	RefreshTokenRequest,
 	RegisterRequest,
 	User,
-} from "../types"
-import { authEndpoints } from "./endpoints"
+} from "../types";
+import { authEndpoints } from "./endpoints";
 
 // Register new user
 export async function registerUser(
@@ -15,14 +15,14 @@ export async function registerUser(
 		method: "POST",
 		headers: { "Content-Type": "application/json" },
 		body: JSON.stringify(data),
-	})
+	});
 
 	if (!response.ok) {
-		const error = await response.json()
-		throw new Error(error.message || "Registration failed")
+		const error = await response.json();
+		throw new Error(error.message || "Registration failed");
 	}
 
-	return response.json()
+	return response.json();
 }
 
 // Login user
@@ -31,14 +31,14 @@ export async function loginUser(data: LoginRequest): Promise<AuthResponse> {
 		method: "POST",
 		headers: { "Content-Type": "application/json" },
 		body: JSON.stringify(data),
-	})
+	});
 
 	if (!response.ok) {
-		const error = await response.json()
-		throw new Error(error.message || "Login failed")
+		const error = await response.json();
+		throw new Error(error.message || "Login failed");
 	}
 
-	return response.json()
+	return response.json();
 }
 
 // Refresh access token
@@ -49,13 +49,13 @@ export async function refreshAccessToken(
 		method: "POST",
 		headers: { "Content-Type": "application/json" },
 		body: JSON.stringify({ refresh_token: refreshToken }),
-	})
+	});
 
 	if (!response.ok) {
-		throw new Error("Token refresh failed")
+		throw new Error("Token refresh failed");
 	}
 
-	return response.json()
+	return response.json();
 }
 
 // Logout user
@@ -64,19 +64,19 @@ export async function logoutUser(refreshToken: string): Promise<void> {
 		method: "POST",
 		headers: { "Content-Type": "application/json" },
 		body: JSON.stringify({ refresh_token: refreshToken }),
-	})
+	});
 }
 
 // Get current user
 export async function getCurrentUser(accessToken: string): Promise<User> {
 	const response = await fetch(authEndpoints.me, {
 		headers: { Authorization: `Bearer ${accessToken}` },
-	})
+	});
 
 	if (!response.ok) {
-		throw new Error("Failed to fetch user")
+		throw new Error("Failed to fetch user");
 	}
 
-	const data = await response.json()
-	return data.user
+	const data = await response.json();
+	return data.user;
 }

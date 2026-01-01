@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router"
+import { createFileRoute, Link } from "@tanstack/react-router";
 import {
 	ArrowLeft,
 	Search,
@@ -6,22 +6,22 @@ import {
 	ShoppingBag,
 	ChevronDown,
 	SlidersHorizontal,
-} from "lucide-react"
-import { useState, useMemo, useRef, useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { useCart } from "@/hooks/use-cart"
+} from "lucide-react";
+import { useState, useMemo, useRef, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useCart } from "@/hooks/use-cart";
 import {
 	useProducts,
 	ProductSkeleton,
 	type ProductFilterParams,
-} from "@/features/products"
-import { Pagination } from "@/components/common/pagination"
-import { useDebounce } from "@/hooks/use-debounce"
+} from "@/features/products";
+import { Pagination } from "@/components/common/pagination";
+import { useDebounce } from "@/hooks/use-debounce";
 
 export const Route = createFileRoute("/categories")({
 	component: CategoriesPage,
-})
+});
 
 // Filter Drawer Component
 function FilterDrawer({
@@ -38,44 +38,44 @@ function FilterDrawer({
 	onPriceRangeChange,
 	onClearAll,
 }: {
-	isOpen: boolean
-	onClose: () => void
-	brands: string[]
-	selectedBrand: string | null
-	onBrandChange: (brand: string | null) => void
-	sizeOptions: string[]
-	selectedSizes: string[]
-	onSizesChange: (sizes: string[]) => void
-	priceRanges: Array<{ id: string; label: string; min: number; max: number }>
-	selectedPriceRange: string | null
-	onPriceRangeChange: (range: string | null) => void
-	onClearAll: () => void
+	isOpen: boolean;
+	onClose: () => void;
+	brands: string[];
+	selectedBrand: string | null;
+	onBrandChange: (brand: string | null) => void;
+	sizeOptions: string[];
+	selectedSizes: string[];
+	onSizesChange: (sizes: string[]) => void;
+	priceRanges: Array<{ id: string; label: string; min: number; max: number }>;
+	selectedPriceRange: string | null;
+	onPriceRangeChange: (range: string | null) => void;
+	onClearAll: () => void;
 }) {
-	const drawerRef = useRef<HTMLDivElement>(null)
+	const drawerRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
 		if (isOpen && drawerRef.current) {
-			drawerRef.current.focus()
+			drawerRef.current.focus();
 		}
-	}, [isOpen])
+	}, [isOpen]);
 
 	useEffect(() => {
 		const handleEscape = (e: KeyboardEvent) => {
 			if (e.key === "Escape" && isOpen) {
-				onClose()
+				onClose();
 			}
-		}
-		document.addEventListener("keydown", handleEscape)
-		return () => document.removeEventListener("keydown", handleEscape)
-	}, [isOpen, onClose])
+		};
+		document.addEventListener("keydown", handleEscape);
+		return () => document.removeEventListener("keydown", handleEscape);
+	}, [isOpen, onClose]);
 
 	const toggleSize = (size: string) => {
 		if (selectedSizes.includes(size)) {
-			onSizesChange(selectedSizes.filter((s) => s !== size))
+			onSizesChange(selectedSizes.filter((s) => s !== size));
 		} else {
-			onSizesChange([...selectedSizes, size])
+			onSizesChange([...selectedSizes, size]);
 		}
-	}
+	};
 
 	return (
 		<>
@@ -201,7 +201,7 @@ function FilterDrawer({
 					<Button
 						variant="outline"
 						onClick={() => {
-							onClearAll()
+							onClearAll();
 						}}
 						className="w-full border-white/20 text-white hover:bg-white/10 rounded-none h-12 font-medium tracking-wide"
 					>
@@ -210,99 +210,99 @@ function FilterDrawer({
 				</div>
 			</div>
 		</>
-	)
+	);
 }
 
 function CategoriesPage() {
-	const { itemCount, addItem } = useCart()
+	const { itemCount, addItem } = useCart();
 
 	// Filter state
-	const [category, setCategory] = useState<string | null>(null)
-	const [searchInput, setSearchInput] = useState("")
-	const [brand, setBrand] = useState<string | null>(null)
-	const [sizes, setSizes] = useState<string[]>([])
-	const [priceRange, setPriceRange] = useState<string | null>(null)
+	const [category, setCategory] = useState<string | null>(null);
+	const [searchInput, setSearchInput] = useState("");
+	const [brand, setBrand] = useState<string | null>(null);
+	const [sizes, setSizes] = useState<string[]>([]);
+	const [priceRange, setPriceRange] = useState<string | null>(null);
 	const [sortBy, setSortBy] = useState<
 		"featured" | "price-low" | "price-high" | "name"
-	>("featured")
-	const [page, setPage] = useState(1)
+	>("featured");
+	const [page, setPage] = useState(1);
 
 	// UI state
-	const [isSearchActive, setIsSearchActive] = useState(false)
-	const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false)
-	const [isSortOpen, setIsSortOpen] = useState(false)
+	const [isSearchActive, setIsSearchActive] = useState(false);
+	const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
+	const [isSortOpen, setIsSortOpen] = useState(false);
 
-	const searchInputRef = useRef<HTMLInputElement>(null)
-	const categoryScrollRef = useRef<HTMLDivElement>(null)
+	const searchInputRef = useRef<HTMLInputElement>(null);
+	const categoryScrollRef = useRef<HTMLDivElement>(null);
 
 	// Debounce search
-	const debouncedSearch = useDebounce(searchInput, 300)
+	const debouncedSearch = useDebounce(searchInput, 300);
 
 	// Build API filters
 	const apiFilters: ProductFilterParams = useMemo(() => {
 		const filters: ProductFilterParams = {
 			page,
 			limit: 20,
-		}
+		};
 
-		if (debouncedSearch) filters.search = debouncedSearch
-		if (category) filters.category_id = category
-		if (brand) filters.brand_id = brand
+		if (debouncedSearch) filters.search = debouncedSearch;
+		if (category) filters.category_id = category;
+		if (brand) filters.brand_id = brand;
 
 		// Map sizes - use first selected size for now (API supports single size filter)
-		if (sizes.length > 0) filters.size = sizes[0]
+		if (sizes.length > 0) filters.size = sizes[0];
 
 		// Map price range
 		if (priceRange) {
-			const range = priceRanges.find((r) => r.id === priceRange)
+			const range = priceRanges.find((r) => r.id === priceRange);
 			if (range) {
-				filters.min_price = range.min
-				if (range.max !== Infinity) filters.max_price = range.max
+				filters.min_price = range.min;
+				if (range.max !== Infinity) filters.max_price = range.max;
 			}
 		}
 
 		// Map sort
 		if (sortBy === "price-low") {
-			filters.sort_by = "price"
-			filters.sort_order = "asc"
+			filters.sort_by = "price";
+			filters.sort_order = "asc";
 		} else if (sortBy === "price-high") {
-			filters.sort_by = "price"
-			filters.sort_order = "desc"
+			filters.sort_by = "price";
+			filters.sort_order = "desc";
 		} else if (sortBy === "name") {
-			filters.sort_by = "name"
-			filters.sort_order = "asc"
+			filters.sort_by = "name";
+			filters.sort_order = "asc";
 		}
 		// 'featured' = default sort from backend
 
-		return filters
-	}, [debouncedSearch, category, brand, sizes, priceRange, sortBy, page])
+		return filters;
+	}, [debouncedSearch, category, brand, sizes, priceRange, sortBy, page]);
 
 	// Fetch products from API
-	const { data, isLoading, isError } = useProducts(apiFilters)
+	const { data, isLoading, isError } = useProducts(apiFilters);
 
 	// Focus search input when activated
 	useEffect(() => {
 		if (isSearchActive && searchInputRef.current) {
-			searchInputRef.current.focus()
+			searchInputRef.current.focus();
 		}
-	}, [isSearchActive])
+	}, [isSearchActive]);
 
 	// Prevent body scroll when drawer is open
 	useEffect(() => {
 		if (isFilterDrawerOpen) {
-			document.body.style.overflow = "hidden"
+			document.body.style.overflow = "hidden";
 		} else {
-			document.body.style.overflow = ""
+			document.body.style.overflow = "";
 		}
 		return () => {
-			document.body.style.overflow = ""
-		}
-	}, [isFilterDrawerOpen])
+			document.body.style.overflow = "";
+		};
+	}, [isFilterDrawerOpen]);
 
 	// Reset page when filters change
 	useEffect(() => {
-		setPage(1)
-	}, [debouncedSearch, category, brand, sizes, priceRange, sortBy])
+		setPage(1);
+	}, [debouncedSearch, category, brand, sizes, priceRange, sortBy]);
 
 	// Categories (TODO: fetch from API in future)
 	const categories = [
@@ -321,7 +321,7 @@ function CategoriesPage() {
 			name: "ACCESSORIES",
 			description: "Bags and small goods",
 		},
-	]
+	];
 
 	// Filter options (TODO: fetch from API in future)
 	const brands = [
@@ -331,65 +331,65 @@ function CategoriesPage() {
 		"GEOMETRIC",
 		"MINIMALIST",
 		"STRUCTURAL",
-	]
-	const sizeOptions = ["XS", "S", "M", "L", "XL"]
+	];
+	const sizeOptions = ["XS", "S", "M", "L", "XL"];
 	const priceRanges = [
 		{ id: "under-500", label: "Under $500", min: 0, max: 500 },
 		{ id: "500-1000", label: "$500 - $1000", min: 500, max: 1000 },
 		{ id: "over-1000", label: "Over $1000", min: 1000, max: Infinity },
-	]
+	];
 
 	const sortOptions = [
 		{ id: "featured", label: "FEATURED" },
 		{ id: "price-low", label: "PRICE: LOW TO HIGH" },
 		{ id: "price-high", label: "PRICE: HIGH TO LOW" },
 		{ id: "name", label: "NAME: A-Z" },
-	]
+	];
 
 	// Active filters count
 	const activeFiltersCount =
-		(brand ? 1 : 0) + (sizes.length > 0 ? 1 : 0) + (priceRange ? 1 : 0)
+		(brand ? 1 : 0) + (sizes.length > 0 ? 1 : 0) + (priceRange ? 1 : 0);
 
 	// Active filters for chips
 	const activeFilters = useMemo(() => {
 		const filters: Array<{ type: "brand" | "size" | "price"; label: string }> =
-			[]
+			[];
 
 		if (brand) {
-			filters.push({ type: "brand", label: brand })
+			filters.push({ type: "brand", label: brand });
 		}
 
 		if (sizes.length > 0) {
 			filters.push({
 				type: "size",
 				label: `${sizes.length} size${sizes.length > 1 ? "s" : ""}`,
-			})
+			});
 		}
 
 		if (priceRange) {
-			const range = priceRanges.find((r) => r.id === priceRange)
+			const range = priceRanges.find((r) => r.id === priceRange);
 			if (range) {
-				filters.push({ type: "price", label: range.label })
+				filters.push({ type: "price", label: range.label });
 			}
 		}
 
-		return filters
-	}, [brand, sizes, priceRange])
+		return filters;
+	}, [brand, sizes, priceRange]);
 
 	const clearAllFilters = () => {
-		setBrand(null)
-		setSizes([])
-		setPriceRange(null)
-	}
+		setBrand(null);
+		setSizes([]);
+		setPriceRange(null);
+	};
 
 	const removeFilter = (type: "brand" | "size" | "price") => {
-		if (type === "brand") setBrand(null)
-		if (type === "size") setSizes([])
-		if (type === "price") setPriceRange(null)
-	}
+		if (type === "brand") setBrand(null);
+		if (type === "size") setSizes([]);
+		if (type === "price") setPriceRange(null);
+	};
 
 	const currentCategory =
-		categories.find((c) => c.id === category) || categories[0]
+		categories.find((c) => c.id === category) || categories[0];
 
 	return (
 		<div className="min-h-screen bg-black text-white">
@@ -402,8 +402,8 @@ function CategoriesPage() {
 							<div className="flex items-center gap-3 w-full md:hidden">
 								<button
 									onClick={() => {
-										setIsSearchActive(false)
-										setSearchInput("")
+										setIsSearchActive(false);
+										setSearchInput("");
 									}}
 									className="p-2 -ml-2 hover:bg-white/10 transition-colors"
 									aria-label="Close search"
@@ -543,8 +543,8 @@ function CategoriesPage() {
 											<button
 												key={option.id}
 												onClick={() => {
-													setSortBy(option.id as typeof sortBy)
-													setIsSortOpen(false)
+													setSortBy(option.id as typeof sortBy);
+													setIsSortOpen(false);
 												}}
 												className={`w-full px-4 py-3 text-left text-sm font-medium tracking-wide transition-colors ${
 													sortBy === option.id
@@ -667,9 +667,9 @@ function CategoriesPage() {
 											<div className="absolute bottom-4 left-4 right-4 transform translate-y-4 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300">
 												<Button
 													onClick={(e) => {
-														e.preventDefault()
-														e.stopPropagation()
-														addItem(product as any)
+														e.preventDefault();
+														e.stopPropagation();
+														addItem(product as any);
 													}}
 													className="w-full bg-white text-black hover:bg-gray-200 rounded-none font-bold tracking-wide"
 												>
@@ -717,9 +717,9 @@ function CategoriesPage() {
 							variant="outline"
 							className="border-white text-white hover:bg-white hover:text-black rounded-none font-medium tracking-wide"
 							onClick={() => {
-								setCategory(null)
-								setSearchInput("")
-								clearAllFilters()
+								setCategory(null);
+								setSearchInput("");
+								clearAllFilters();
 							}}
 						>
 							CLEAR ALL FILTERS
@@ -766,5 +766,5 @@ function CategoriesPage() {
 				onClearAll={clearAllFilters}
 			/>
 		</div>
-	)
+	);
 }

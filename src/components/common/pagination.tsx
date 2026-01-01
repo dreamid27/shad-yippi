@@ -1,9 +1,9 @@
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 
 interface PaginationProps {
-	currentPage: number
-	totalPages: number
-	onPageChange: (page: number) => void
+	currentPage: number;
+	totalPages: number;
+	onPageChange: (page: number) => void;
 }
 
 export function Pagination({
@@ -11,7 +11,7 @@ export function Pagination({
 	totalPages,
 	onPageChange,
 }: PaginationProps) {
-	if (totalPages <= 1) return null
+	if (totalPages <= 1) return null;
 
 	return (
 		<div className="flex items-center justify-center gap-2 py-8">
@@ -44,7 +44,7 @@ export function Pagination({
 							>
 								{page}
 							</button>
-						)
+						);
 					}
 
 					// Show ellipsis
@@ -53,10 +53,10 @@ export function Pagination({
 							<span key={page} className="text-gray-400">
 								...
 							</span>
-						)
+						);
 					}
 
-					return null
+					return null;
 				})}
 			</div>
 
@@ -69,5 +69,5 @@ export function Pagination({
 				NEXT →
 			</Button>
 		</div>
-	)
+	);
 }

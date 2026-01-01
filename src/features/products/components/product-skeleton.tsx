@@ -12,5 +12,5 @@ export function ProductSkeleton({ count = 6 }: { count?: number }) {
 				</div>
 			))}
 		</div>
-	)
+	);
 }

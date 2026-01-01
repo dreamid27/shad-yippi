@@ -1,8 +1,8 @@
 interface StockIndicatorProps {
-	stockQuantity: number
-	isActive: boolean
-	isInStock: boolean
-	lowStockThreshold?: number
+	stockQuantity: number;
+	isActive: boolean;
+	isInStock: boolean;
+	lowStockThreshold?: number;
 }
 
 export function StockIndicator({
@@ -17,13 +17,13 @@ export function StockIndicator({
 		| "low-stock"
 		| "out-of-stock"
 		| "inactive" => {
-		if (!isActive) return "inactive"
-		if (!isInStock || stockQuantity === 0) return "out-of-stock"
-		if (stockQuantity <= lowStockThreshold) return "low-stock"
-		return "in-stock"
-	}
+		if (!isActive) return "inactive";
+		if (!isInStock || stockQuantity === 0) return "out-of-stock";
+		if (stockQuantity <= lowStockThreshold) return "low-stock";
+		return "in-stock";
+	};
 
-	const status = getStatus()
+	const status = getStatus();
 
 	// Status configurations
 	const statusConfig = {
@@ -51,9 +51,9 @@ export function StockIndicator({
 			bgColor: "bg-gray-400/10",
 			borderColor: "border-gray-400/20",
 		},
-	}
+	};
 
-	const config = statusConfig[status]
+	const config = statusConfig[status];
 
 	return (
 		<div
@@ -76,5 +76,5 @@ export function StockIndicator({
 			/>
 			<span>{config.label}</span>
 		</div>
-	)
+	);
 }

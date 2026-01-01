@@ -5,14 +5,21 @@ export type {
 	GuestCartItem,
 	CartMergeRequest,
 	StockValidationError,
-} from "./types"
+	StockValidationResponse,
+	StockValidationRequest,
+} from "./types";
 
 // Export store
-export { useCartStore } from "./store/cart-store"
+export { useCartStore } from "./store/cart-store";
 
 // Export hooks
-export { useCartSync } from "./hooks/use-cart-sync"
-// export { useCheckoutValidation } from './hooks/use-checkout-validation'
+export { useCartSync } from "./hooks/use-cart-sync";
+export { useCheckoutValidation } from "./hooks/use-checkout-validation";
 
-// Export components (will be added later)
-// export { CartEmpty } from './components/cart-empty'
+// Export components
+export { CartItemCard } from "./components/cart-item-card";
+export { OrderSummary } from "./components/order-summary";
+export {
+	StockValidationErrorBadge,
+	ValidationSummary,
+} from "./components/stock-validation-error";
